@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { IoClose, IoSend } from "react-icons/io5";
-import { TbMessageChatbot } from "react-icons/tb";
+import { TbMessageChatbot, TbArrowsMaximize, TbArrowsMinimize } from "react-icons/tb";
 import { RiArrowRightUpLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 
@@ -22,15 +22,25 @@ type ResponseEntry = {
 };
 
 // ─── Smart Message Renderer ──────────────────────────────────────────────────
-const NUMBER_EMOJIS = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣"];
+// Plain number markers — longest first so "10." is matched before "1."
+const NUMBER_EMOJIS = ["10.", "1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9."];
 
-// Normalise a line: convert "1. " / "1) " style to emoji style so card renderer always works
+// Normalise a line: convert emoji numbers OR "1. " / "1) " style to plain "N. " format
+const EMOJI_TO_NUM: [string, number][] = [
+  ["🔟", 10], ["1️⃣", 1], ["2️⃣", 2], ["3️⃣", 3], ["4️⃣", 4],
+  ["5️⃣", 5], ["6️⃣", 6], ["7️⃣", 7], ["8️⃣", 8], ["9️⃣", 9],
+];
 function normalizeLine(line: string): string {
+  const trimmed = line.trimStart();
+  for (const [em, num] of EMOJI_TO_NUM) {
+    if (trimmed.startsWith(em)) {
+      return num + ". " + trimmed.slice(em.length).trim();
+    }
+  }
   const m = line.match(/^(\s*)(\d+)[.)\s]\s*(.*)$/);
   if (m) {
     const num = parseInt(m[2], 10);
-    const emoji = NUMBER_EMOJIS[num - 1];
-    if (emoji) return emoji + " " + m[3];
+    if (num >= 1 && num <= 15) return num + ". " + m[3];
   }
   return line;
 }
@@ -42,9 +52,7 @@ const PROJECT_MAP_LINKS: Record<string, string> = {
   "northsky":           "https://www.google.com/maps/search/?api=1&query=Northsky+GIFT+City+SEZ+Gandhinagar",
   "shilp celestial":    "https://www.google.com/maps/search/?api=1&query=Shilp+Celestial+Vaishnodevi+Circle+Ahmedabad",
   "skyline":            "https://www.google.com/maps/search/?api=1&query=Skyline+Adani+Shantigram+Ahmedabad",
-  "shilp paradise 2":   "https://www.google.com/maps/search/?api=1&query=Shilp+Paradise+2+Vejalpur+Ahmedabad",
   "shilp paradise":     "https://www.google.com/maps/search/?api=1&query=Shilp+Paradise+Sindhu+Bhavan+Road+Ahmedabad",
-  "shilp serene 2":     "https://www.google.com/maps/search/?api=1&query=Shilp+Serene+2+Judges+Bungalow+Ahmedabad",
   "shilp serene":       "https://www.google.com/maps/search/?api=1&query=Shilp+Serene+Shilaj+Ahmedabad",
   "revanta":            "https://www.google.com/maps/search/?api=1&query=Revanta+Shela+Ahmedabad",
   // Commercial
@@ -335,8 +343,8 @@ function renderBotText(text: string): React.ReactNode {
                     }}
                   >
                     {/* # */}
-                    <td style={{ padding: "7px 10px", fontSize: "13px", whiteSpace: "nowrap" }}>
-                      {row.num}
+                    <td style={{ padding: "7px 10px", fontSize: "11.5px", fontWeight: 700, color: "#555", whiteSpace: "nowrap" }}>
+                      {ri + 1}
                     </td>
                     {/* Project */}
                     <td style={{ padding: "7px 10px", fontWeight: 700, color: "#0f0f0f", whiteSpace: "nowrap" }}>
@@ -460,20 +468,20 @@ const knowledgeBase: ResponseEntry[] = [
     quickReplies: ["All Projects", "Contact Us", "About Company", "View Pricing"],
   },
   {
-    keywords: ["map", "google map", "google maps", "link", "maps link", "link bejo", "link bhejo", "map link", "navigate", "direction", "directions", "route", "kaise aaye", "kaise jaayein", "how to reach", "kahan hai", "kahan h", "kidhar hai", "project location", "project ka address", "ka location", "ki location", "location chahiye", "where is shilp", "ka address", "serene location", "serene map", "serene address", "serene kahan", "northsky location", "northsky map", "northsky address", "residency location", "residency map", "residency address", "celestial location", "celestial map", "celestial address", "skyline location", "skyline map", "skyline address", "paradise location", "paradise map", "paradise address", "revanta location", "revanta map", "revanta address", "centrica location", "centrica map", "centrica address", "business gateway location", "business gateway map", "twin tower location", "twin tower map", "sacred location", "sacred map", "sacred address", "shilp one location", "shilp one map", "serene 2 location", "serene 2 map", "industrial park location", "industrial park map", "industrial location", "olives location", "olives map", "olives address"],
-    response: "📍 Shilp Group — All Project Maps:\n\n🏢 Head Office (Shilp House, Bodakdev):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+House+Rajpath+Rangoli+Road+Bodakdev+Ahmedabad\n\n🏠 RESIDENTIAL\n1️⃣ Shilp Residency (Gota):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Residency+Gota+Ahmedabad\n\n2️⃣ Northsky (GIFT City SEZ):\nhttps://www.google.com/maps/search/?api=1&query=Northsky+GIFT+City+SEZ+Gandhinagar\n\n3️⃣ Shilp Celestial (Vaishnodevi):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Celestial+Vaishnodevi+Circle+Ahmedabad\n\n4️⃣ Skyline (Adani Shantigram):\nhttps://www.google.com/maps/search/?api=1&query=Skyline+Adani+Shantigram+Ahmedabad\n\n5️⃣ Shilp Paradise (Sindhu Bhavan Rd):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Paradise+Sindhu+Bhavan+Road+Ahmedabad\n\n6️⃣ Shilp Serene (Shilaj):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Serene+Shilaj+Ahmedabad\n\n7️⃣ Revanta (Shela):\nhttps://www.google.com/maps/search/?api=1&query=Revanta+Shela+Ahmedabad\n\n🏢 COMMERCIAL\n1️⃣ Centrica (GIFT City):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Centrica+GIFT+City+Gandhinagar\n\n2️⃣ Business Gateway (Vaishnodevi):\nhttps://www.google.com/maps/search/?api=1&query=Business+Gateway+Vaishnodevi+Circle+Ahmedabad\n\n3️⃣ Twin Tower (GIFT City SEZ):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Twin+Tower+GIFT+City+SEZ+Gandhinagar\n\n4️⃣ Shilp Sacred (Iskon-Ambli):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Sacred+Iskon+Ambli+Ahmedabad\n\n5️⃣ Shilp One (Shilaj Circle):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+One+Shilaj+Circle+Ahmedabad\n\n6️⃣ Shilp Serene 2 (Judges Bungalow):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Serene+2+Judges+Bungalow+Ahmedabad\n\n7️⃣ Industrial Park (Charodi):\nhttps://www.google.com/maps/search/?api=1&query=Industrial+Park+Charodi+Ahmedabad\n\n🌿 PLOTTING\n1️⃣ Shilp Olives (Sanand Nalsarovar):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Olives+Sanand+Nalsarovar+Road+Ahmedabad\n\n📞 +91 9898211567 / +91 9898508567",
+    keywords: ["map", "google map", "google maps", "link", "maps link", "link bejo", "link bhejo", "map link", "navigate", "direction", "directions", "route", "kaise aaye", "kaise jaayein", "how to reach", "kahan hai", "kahan h", "kidhar hai", "project location", "project ka address", "ka location", "ki location", "location chahiye", "where is shilp", "ka address", "serene location", "serene map", "serene address", "serene kahan", "northsky location", "northsky map", "northsky address", "residency location", "residency map", "residency address", "celestial location", "celestial map", "celestial address", "skyline location", "skyline map", "skyline address", "paradise location", "paradise map", "paradise address", "revanta location", "revanta map", "revanta address", "centrica location", "centrica map", "centrica address", "business gateway location", "business gateway map", "twin tower location", "twin tower map", "sacred location", "sacred map", "sacred address", "shilp one location", "shilp one map", "industrial park location", "industrial park map", "industrial location", "olives location", "olives map", "olives address"],
+    response: "📍 Shilp Group — All Project Maps:\n\n🏢 Head Office (Shilp House, Bodakdev):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+House+Rajpath+Rangoli+Road+Bodakdev+Ahmedabad\n\n🏠 RESIDENTIAL\n• Shilp Residency (Gota):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Residency+Gota+Ahmedabad\n\n• Northsky (GIFT City SEZ):\nhttps://www.google.com/maps/search/?api=1&query=Northsky+GIFT+City+SEZ+Gandhinagar\n\n• Shilp Celestial (Vaishnodevi):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Celestial+Vaishnodevi+Circle+Ahmedabad\n\n• Skyline (Adani Shantigram):\nhttps://www.google.com/maps/search/?api=1&query=Skyline+Adani+Shantigram+Ahmedabad\n\n• Shilp Paradise (Sindhu Bhavan Rd):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Paradise+Sindhu+Bhavan+Road+Ahmedabad\n\n• Shilp Serene (Shilaj):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Serene+Shilaj+Ahmedabad\n\n• Revanta (Shela):\nhttps://www.google.com/maps/search/?api=1&query=Revanta+Shela+Ahmedabad\n\n🏢 COMMERCIAL\n• Centrica (GIFT City):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Centrica+GIFT+City+Gandhinagar\n\n• Business Gateway (Vaishnodevi):\nhttps://www.google.com/maps/search/?api=1&query=Business+Gateway+Vaishnodevi+Circle+Ahmedabad\n\n• Twin Tower (GIFT City SEZ):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Twin+Tower+GIFT+City+SEZ+Gandhinagar\n\n• Shilp Sacred (Iskon-Ambli):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Sacred+Iskon+Ambli+Ahmedabad\n\n• Shilp One (Shilaj Circle):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+One+Shilaj+Circle+Ahmedabad\n\n• Industrial Park (Charodi):\nhttps://www.google.com/maps/search/?api=1&query=Industrial+Park+Charodi+Ahmedabad\n\n🌿 PLOTS\n• Shilp Olives (Sanand Nalsarovar):\nhttps://www.google.com/maps/search/?api=1&query=Shilp+Olives+Sanand+Nalsarovar+Road+Ahmedabad\n\n📞 +91 9898211567 / +91 9898508567",
     quickReplies: ["Contact Us", "View Projects", "Make Enquiry"],
     link: { label: "Contact Page →", path: "/contact-us" },
   },
   {
-    keywords: ["commercial", "office", "workspace", "dukaan", "business", "gift city", "centrica", "business gateway", "twin tower", "shilp one", "industrial", "shilp sacred", "sacred", "serene 2", "judges", "shilaj"],
-    response: "🏢 Commercial Projects:\n\n1️⃣ Centrica — GIFT City Domestic\n   📐 1769 sqft Office → ₹1.82 Cr + GST\n   📐 3574 sqft Showroom → ₹10.3 Cr + GST\n   📅 Possession: Dec 2029\n\n2️⃣ Business Gateway — Vaishnodevi Circle\n   📐 4100 sqft Office/Showroom → ₹3.45 Cr + GST\n   📅 Ready ✅\n\n3️⃣ Twin Tower — GIFT City SEZ\n   📐 1800 sqft Offices → ₹1.90 Cr + GST\n   📅 Possession: Dec 2031\n\n4️⃣ Shilp Sacred — Iskon-Ambli\n   📐 1500 sqft Office → ₹1.37 Cr + GST\n   📐 2600 sqft Showroom → ₹7.00 Cr + GST\n   📅 Possession: May 2030\n\n5️⃣ Shilp One — Shilaj Circle\n   📐 1944 sqft Showroom → ₹2.35 Cr + GST\n\n6️⃣ Shilp Serene 2 — Judges Bungalow\n   📐 2217 sqft Showroom → ₹4.65 Cr + GST\n\n7️⃣ Industrial Park — Charodi\n   📐 3500 sqft Plot → ₹2.62 Cr + GST  |  Ready ✅\n\n📞 Exact rates: +91 9898211567 / +91 9898508567",
+    keywords: ["commercial", "office", "workspace", "dukaan", "business", "gift city", "centrica", "business gateway", "twin tower", "shilp one", "industrial", "shilp sacred", "sacred", "shilaj"],
+    response: "🏢 Commercial Projects:\n\n1. Centrica — GIFT City Domestic\n   📐 1769 sqft Office → ₹1.82 Cr + GST\n   📐 3574 sqft Showroom → ₹10.3 Cr + GST\n   📅 Possession: Dec 2029\n\n2. Business Gateway — Vaishnodevi Circle\n   📐 4100 sqft Office/Showroom → ₹3.45 Cr + GST\n   📅 Ready ✅\n\n3. Twin Tower — GIFT City SEZ\n   📐 1800 sqft Offices → ₹1.90 Cr + GST\n   📅 Possession: Dec 2031\n\n4. Shilp Sacred — Iskon-Ambli\n   📐 1500 sqft Office → ₹1.37 Cr + GST\n   📐 2600 sqft Showroom → ₹7.00 Cr + GST\n   📅 Possession: May 2030\n\n5. Shilp One — Shilaj Circle\n   📐 1944 sqft Showroom → ₹2.35 Cr + GST\n\n6. Industrial Park — Charodi\n   📐 3500 sqft Plot → ₹2.62 Cr + GST\n   📅 Ready ✅\n\n📞 Exact rates: +91 9898211567 / +91 9898508567",
     quickReplies: ["Make Enquiry", "Residential Projects", "Contact Us", "View Plots"],
     link: { label: "View Commercial Projects →", path: "/projects/commerical" },
   },
   {
     keywords: ["residential", "home", "flat", "apartment", "ghar", "makaan", "villa", "2bhk", "3bhk", "4bhk", "northsky", "north sky", "revanta", "serene", "paradise", "residency", "skyline", "celestial", "vaishnodevi", "shilaj", "shela", "gota", "shantigram"],
-    response: "🏠 Residential Projects:\n\n1️⃣ Shilp Residency — Gota\n   📐 2050 sqft 3BHK → ₹1.18 Cr + GST\n   📐 2360 sqft 3BHK → ₹1.37 Cr + GST\n   📐 3341 sqft 4BHK → ₹1.94 Cr + GST\n   📅 Possession: Jun 2027\n\n2️⃣ Northsky — GIFT City SEZ\n   📐 1511 sqft 2BHK → ₹1.50 Cr + GST\n   📐 1875 sqft 3BHK → ₹1.85 Cr + GST\n   📅 Possession: Mar 2028\n\n3️⃣ Shilp Celestial — Vaishnodevi\n   📐 2379 sqft 3BHK → ₹1.28 Cr + GST\n   📐 3153 sqft 4BHK → ₹1.70 Cr + GST\n   📅 Possession: Jul 2030\n\n4️⃣ Skyline — Adani Shantigram\n   📐 3071 sqft 4BHK → ₹1.90 Cr + GST\n   📅 Possession: Sep 2029\n\n5️⃣ Shilp Paradise — Sindhubhavan\n   📐 3380 sqft 4BHK → ₹2.69 Cr + GST\n   📅 Possession: Jun 2025\n\n6️⃣ Shilp Serene — Shilaj\n   📐 1750 sqft 3BHK → ₹85 Lakh + GST\n   📅 Ready ✅\n\n7️⃣ Revanta — Shela\n   📐 1510 sqft 3BHK → ₹64 Lakh + GST\n   📅 Ready ✅\n\n🏊 Pool • Gym • Clubhouse • 24x7 Security\n✅ All RERA Registered\n\n📞 Exact rates: +91 9898211567 / +91 9898508567",
+    response: "🏠 Residential Projects:\n\n1. Shilp Residency — Gota\n   📐 2050 sqft 3BHK → ₹1.18 Cr + GST\n   📐 2360 sqft 3BHK → ₹1.37 Cr + GST\n   📐 3341 sqft 4BHK → ₹1.94 Cr + GST\n   📅 Possession: Jun 2027\n\n2. Northsky — GIFT City SEZ\n   📐 1511 sqft 2BHK → ₹1.50 Cr + GST\n   📐 1875 sqft 3BHK → ₹1.85 Cr + GST\n   📅 Possession: Mar 2028\n\n3. Shilp Celestial — Vaishnodevi\n   📐 2379 sqft 3BHK → ₹1.28 Cr + GST\n   📐 3153 sqft 4BHK → ₹1.70 Cr + GST\n   📅 Possession: Jul 2030\n\n4. Skyline — Adani Shantigram\n   📐 3071 sqft 4BHK → ₹1.90 Cr + GST\n   📅 Possession: Sep 2029\n\n5. Shilp Paradise — Sindhubhavan\n   📐 3380 sqft 4BHK → ₹2.69 Cr + GST\n   📅 Possession: Jun 2025\n\n6. Shilp Serene — Shilaj\n   📐 1750 sqft 3BHK → ₹85 Lakh + GST\n   📅 Ready ✅\n\n7. Revanta — Shela\n   📐 1510 sqft 3BHK → ₹64 Lakh + GST\n   📅 Ready ✅\n\n🏊 Pool • Gym • Clubhouse • 24x7 Security\n✅ All RERA Registered\n\n📞 Exact rates: +91 9898211567 / +91 9898508567",
     quickReplies: ["Make Enquiry", "Commercial Projects", "View Plots", "Contact Us"],
     link: { label: "View Residential Projects →", path: "/projects/residential" },
   },
@@ -491,7 +499,7 @@ const knowledgeBase: ResponseEntry[] = [
   },
   {
     keywords: ["about", "company", "shilp group", "who", "kaun", "founder", "history", "yash", "brahmbhatt", "story", "established", "since", "started", "baare", "bare", "snehal", "ceo", "owner", "leadership", "director"],
-    response: "🏛️ About Shilp Group:\n\n📍 Shilp House, Rajpath Rangoli Road, Bodakdev, Ahmedabad – 380054\n🕐 Est. 2004 | 20+ years | RERA Registered\n\n👨‍💼 Founder & CEO: Mr. Yash Brahmbhatt\nA visionary leader who started Shilp Group in 2004 with a land auction bid. He was the first developer to build on Sindhu Bhavan Road (now a prime address) and at GIFT City. Under his leadership, Shilp has delivered 50+ projects with no compromise on quality.\n\n👩‍💼 COO: Mrs. Snehal Brahmbhatt\nLeads Marketing, PR & Communications. Also founder of the Snehshilp Foundation — an NGO focused on education for Indian youth.\n\n✨ Company Highlights:\n• 50+ projects completed | 14+ ongoing\n• 10,000+ happy customers\n• 11+ prestigious awards\n• Pioneer on Sindhu Bhavan Road\n• First developer at GIFT City, Gandhinagar\n\n🎯 Quality, Integrity & Authenticity",
+    response: "🏛️ About Shilp Group:\n\n📍 Shilp House, Rajpath Rangoli Road, Bodakdev, Ahmedabad – 380054\n🕐 Est. 2004 | 20+ years | RERA Registered\n\n👨‍💼 Founder & CEO: Mr. Yash Brahmbhatt\nA visionary leader who started Shilp Group in 2004 with a land auction bid. He was the first developer to build on Sindhu Bhavan Road (now a prime address) and at GIFT City. Under his leadership, Shilp has delivered 50+ projects with no compromise on quality.\n\n👩‍💼 COO: Mrs. Snehal Brahmbhatt\nLeads Marketing, PR & Communications. Also founder of the Snehshilp Foundation — an NGO focused on education for Indian youth.\n\n✨ Company Highlights:\n• 52 projects completed | 15 ongoing\n• 10,000+ happy customers\n• 11+ prestigious awards\n• Pioneer on Sindhu Bhavan Road\n• First developer at GIFT City, Gandhinagar\n\n🎯 Quality, Integrity & Authenticity",
     quickReplies: ["View Awards", "View Projects", "Contact Us", "Meet the Team"],
     link: { label: "About Us →", path: "/about-us" },
   },
@@ -503,7 +511,7 @@ const knowledgeBase: ResponseEntry[] = [
   },
   {
     keywords: ["price", "cost", "rate", "kimat", "kitna", "kitne", "budget", "paisa", "rupee", "lakh", "crore", "affordable", "pricing", "daam"],
-    response: "💰 All Project Rates (+ GST):\n\n🏠 RESIDENTIAL\nRevanta (Shela) · 1510 sqft 3BHK · ₹64 Lakh + GST ✅\nShilp Serene (Shilaj) · 1750 sqft 3BHK · ₹85 Lakh + GST ✅\nShilp Residency · 2050 sqft 3BHK · ₹1.18 Cr + GST\nShilp Residency · 2360 sqft 3BHK · ₹1.37 Cr + GST\nCelestial · 2379 sqft 3BHK · ₹1.28 Cr + GST\nNorthsky · 1511 sqft 2BHK · ₹1.50 Cr + GST\nNorthsky · 1875 sqft 3BHK · ₹1.85 Cr + GST\nSkyline · 3071 sqft 4BHK · ₹1.90 Cr + GST\nCelestial · 3153 sqft 4BHK · ₹1.70 Cr + GST\nShilp Residency · 3341 sqft 4BHK · ₹1.94 Cr + GST\nShilp Paradise · 3380 sqft 4BHK · ₹2.69 Cr + GST\n\n🏢 COMMERCIAL\nSacred Office · 1500 sqft · ₹1.37 Cr + GST\nTwin Tower · 1800 sqft · ₹1.90 Cr + GST\nCentrica Office · 1769 sqft · ₹1.82 Cr + GST\nShilp One · 1944 sqft · ₹2.35 Cr + GST\nSerene 2 · 2217 sqft · ₹4.65 Cr + GST\nIndustrial Park · 3500 sqft · ₹2.62 Cr + GST ✅\nBusiness Gateway · 4100 sqft · ₹3.45 Cr + GST ✅\nSacred Showroom · 2600 sqft · ₹7.00 Cr + GST\nCentrica Showroom · 3574 sqft · ₹10.3 Cr + GST\n\n🌿 PLOTS\nShilp Olives · 6456+ sqft · ₹1.83 Cr + GST (Dec 2026)\n\n📞 +91 9898211567 / +91 9898508567",
+    response: "💰 All Project Rates (+ GST):\n\n🏠 RESIDENTIAL\nRevanta (Shela) · 1510 sqft 3BHK · ₹64 Lakh + GST ✅\nShilp Serene (Shilaj) · 1750 sqft 3BHK · ₹85 Lakh + GST ✅\nShilp Residency · 2050 sqft 3BHK · ₹1.18 Cr + GST\nShilp Residency · 2360 sqft 3BHK · ₹1.37 Cr + GST\nCelestial · 2379 sqft 3BHK · ₹1.28 Cr + GST\nNorthsky · 1511 sqft 2BHK · ₹1.50 Cr + GST\nNorthsky · 1875 sqft 3BHK · ₹1.85 Cr + GST\nSkyline · 3071 sqft 4BHK · ₹1.90 Cr + GST\nCelestial · 3153 sqft 4BHK · ₹1.70 Cr + GST\nShilp Residency · 3341 sqft 4BHK · ₹1.94 Cr + GST\nShilp Paradise · 3380 sqft 4BHK · ₹2.69 Cr + GST\n\n🏢 COMMERCIAL\nSacred Office · 1500 sqft · ₹1.37 Cr + GST\nTwin Tower · 1800 sqft · ₹1.90 Cr + GST\nCentrica Office · 1769 sqft · ₹1.82 Cr + GST\nShilp One · 1944 sqft · ₹2.35 Cr + GST\nIndustrial Park · 3500 sqft · ₹2.62 Cr + GST ✅\nBusiness Gateway · 4100 sqft · ₹3.45 Cr + GST ✅\nSacred Showroom · 2600 sqft · ₹7.00 Cr + GST\nCentrica Showroom · 3574 sqft · ₹10.3 Cr + GST\n\n🌿 PLOTS\nShilp Olives · 6456+ sqft · ₹1.83 Cr + GST (Dec 2026)\n\n📞 +91 9898211567 / +91 9898508567",
     quickReplies: ["Commercial Projects", "Residential Projects", "View Plots", "Make Enquiry"],
   },
   {
@@ -543,7 +551,7 @@ const knowledgeBase: ResponseEntry[] = [
   },
   {
     keywords: ["enquiry", "enquire", "book", "schedule", "appointment", "brochure"],
-    response: "📬 Book an Enquiry / Appointment:\n\n1️⃣ Call/WhatsApp: +91 9898211567 / +91 9898508567\n2️⃣ Email: info@shilp.co.in\n3️⃣ Online form on Contact page\n4️⃣ Site Visit — tell us your preferred date!\n\n🕐 Office Hours: Mon–Sun  10AM–7PM\n   (All 7 days open!)\n\n⚡ Response within 24 hours\n🎁 Free consultation & brochure!",
+    response: "📬 Book an Enquiry / Appointment:\n\n• Call/WhatsApp: +91 9898211567 / +91 9898508567\n• Email: info@shilp.co.in\n• Online form on Contact page\n• Site Visit — tell us your preferred date!\n\n🕐 Office Hours: Mon–Sun  10AM–7PM\n   (All 7 days open!)\n\n⚡ Response within 24 hours\n🎁 Free consultation & brochure!",
     quickReplies: ["Site Visit Info", "View Projects", "View Pricing", "Contact Us"],
     link: { label: "Enquiry Form →", path: "/contact-us" },
   },
@@ -558,8 +566,20 @@ const knowledgeBase: ResponseEntry[] = [
     quickReplies: ["Residential Projects", "Commercial Projects", "Make Enquiry"],
   },
   {
+    keywords: ["brochure", "photo", "photos", "image", "images", "picture", "pictures", "gallery", "floor plan", "floor plans", "pdf", "catalogue", "catalog", "pics", "tasveer", "broucher", "download", "dekhao photo", "photo bhejo", "brochure bhejo", "brochure chahiye", "photo chahiye"],
+    response: "📸 Photos & Brochure:\n\nSaare project ki photos, floor plans aur brochures hamare website pe available hain!\n\nWebsite pe project section mein dekh sakte hain ya hum directly WhatsApp par bhej sakte hain.\n\n📲 WhatsApp: +91 9909961234\n📞 +91 9898211567 / +91 9898508567\n✉️ info@shilp.co.in\n\nKis project ka brochure chahiye? 😊",
+    quickReplies: ["Residential Projects", "Commercial Projects", "Contact Us", "Make Enquiry"],
+    link: { label: "View Projects →", path: "/shilp-projects" },
+  },
+  {
+    keywords: ["kitne project", "total project", "how many project", "completed project", "ongoing project", "kitne complete", "kitne ongoing", "total kitne", "kaun kaun se", "pure list", "sab project", "poora portfolio", "how many completed", "delivered", "handover"],
+    response: "📊 Shilp Group — Project Count:\n\n✅ Completed / Delivered: 52 Projects\n🔄 Ongoing / Active: 14 Projects\n🏗️ Total: 66 Projects\n\n52 Completed Projects (2004–2024):\nShilp Arcade, Shilp Complex, Shaligram, Sashvat, Shilp Square A & B, Shilp Annexe, Shilp 3, HCG Hospital, Shilp Aaron (Bopal), Silver Nest, Shilp Saral, Parkview Green, Green City, Shilp Sapphire, City Square, Garden View, Green View, City Center 1 & 2, Blossom Luxuria, Shilp Elanza, Shivalik Shilp 1 & 2, Shilp Aperia, Shilp Arista, Asian Square, Shilp Satved, Shilp Shaligram, Shilp The Address, Shilp Zaveri, Shilp Epitome, Shilp Aaron (Rajpath), Shilp Corporate Park, Shilp 14, Shilp Revanta ✅, Shilp Serene ✅, Shilp Business Gateway ✅, Shilp Industrial Park ✅, Shilp One ✅, Shilp North Sky ✅, Shilp SkyLine ✅, Shilp Twin Tower ✅, Shilp Incubation Center ✅, and more!\n\n🔄 14 Ongoing Projects — type 'All Projects' for full details\n\n📞 +91 9898211567 / +91 9898508567",
+    quickReplies: ["All Projects", "Residential Projects", "Commercial Projects", "Contact Us"],
+    link: { label: "View All Projects →", path: "/shilp-projects" },
+  },
+  {
     keywords: ["project", "projects", "saare", "sab", "all", "kitne", "total", "list", "portfolio", "properties", "property", "real estate", "sabhi", "detail", "details", "batao", "btao", "bataiye", "dikhao", "show"],
-    response: "🏗️ Shilp Group — All Current Projects:\n\n🏠 RESIDENTIAL\n1️⃣ Shilp Residency — Gota\n   📐 2050 sqft 3BHK → ₹1.18 Cr + GST\n   📐 2360 sqft 3BHK → ₹1.37 Cr + GST\n   📐 3341 sqft 4BHK → ₹1.94 Cr + GST\n   📅 Jun 2027\n\n2️⃣ Northsky — GIFT City SEZ\n   📐 1511 sqft 2BHK → ₹1.50 Cr + GST\n   📐 1875 sqft 3BHK → ₹1.85 Cr + GST\n   📅 Mar 2028\n\n3️⃣ Shilp Celestial — Vaishnodevi\n   📐 2379 sqft 3BHK → ₹1.28 Cr + GST\n   📐 3153 sqft 4BHK → ₹1.70 Cr + GST\n   📅 Jul 2030\n\n4️⃣ Skyline — Adani Shantigram\n   📐 3071 sqft 4BHK → ₹1.90 Cr + GST\n   📅 Sep 2029\n\n5️⃣ Shilp Paradise — Sindhubhavan\n   📐 3380 sqft 4BHK → ₹2.69 Cr + GST\n   📅 Jun 2025\n\n6️⃣ Shilp Paradise 2 — Vejalpur\n   📐 3750 sqft 4BHK → ₹2.99 Cr + GST\n   📅 Aug 2026\n\n7️⃣ Shilp Serene — Shilaj\n   📐 1750 sqft 3BHK → ₹85 Lakh + GST\n   📅 Ready ✅\n\n8️⃣ Revanta — Shela\n   📐 1510 sqft 3BHK → ₹64 Lakh + GST\n   📅 Ready ✅\n\n🏢 COMMERCIAL\n1️⃣ Centrica — GIFT City Domestic\n   📐 1769 sqft Office → ₹1.82 Cr + GST\n   📐 3574 sqft Showroom → ₹10.3 Cr + GST\n   📅 Dec 2029\n\n2️⃣ Business Gateway — Vaishnodevi Circle\n   📐 4100 sqft Office/Showroom → ₹3.45 Cr + GST\n   📅 Ready ✅\n\n3️⃣ Twin Tower — GIFT City SEZ\n   📐 1800 sqft Office → ₹1.90 Cr + GST\n   📅 Dec 2031\n\n4️⃣ Shilp Sacred — Iskon-Ambli\n   📐 1500 sqft Office → ₹1.37 Cr + GST\n   📐 2600 sqft Showroom → ₹7.00 Cr + GST\n   📅 May 2030\n\n5️⃣ Shilp One — Shilaj Circle\n   📐 1944 sqft Showroom → ₹2.35 Cr + GST\n\n6️⃣ Shilp Serene 2 — Judges Bungalow\n   📐 2217 sqft Showroom → ₹4.65 Cr + GST\n\n🏭 INDUSTRIAL / PLOTS\n1️⃣ Industrial Park — Charodi\n   📐 3500 sqft Plot → ₹2.62 Cr + GST\n   📅 Ready ✅\n\n2️⃣ Shilp Olives — Sanand Nalsarovar Rd\n   📐 6456+ sqft Plot → ₹1.83 Cr + GST\n   📅 Dec 2026\n\n✅ All RERA Registered | 📞 +91 9898211567",
+    response: "🏗️ Shilp Group — All Ongoing Projects:\n\n📊 52 Completed ✅ | 14 Ongoing 🔄 | Total: 66 Projects\n\n🏠 RESIDENTIAL\n1. Shilp Residency — Gota\n   📐 2050 sqft 3BHK → ₹1.18 Cr + GST\n   📐 2360 sqft 3BHK → ₹1.37 Cr + GST\n   📐 3341 sqft 4BHK → ₹1.94 Cr + GST\n   📅 Jun 2027\n\n2. Northsky — GIFT City SEZ\n   📐 1511 sqft 2BHK → ₹1.50 Cr + GST\n   📐 1875 sqft 3BHK → ₹1.85 Cr + GST\n   📅 Mar 2028\n\n3. Shilp Celestial — Vaishnodevi\n   📐 2379 sqft 3BHK → ₹1.28 Cr + GST\n   📐 3153 sqft 4BHK → ₹1.70 Cr + GST\n   📅 Jul 2030\n\n4. Skyline — Adani Shantigram\n   📐 3071 sqft 4BHK → ₹1.90 Cr + GST\n   📅 Sep 2029\n\n5. Shilp Paradise — Sindhubhavan\n   📐 3380 sqft 4BHK → ₹2.69 Cr + GST\n   📅 Jun 2025\n\n6. Shilp Serene — Shilaj\n   📐 1750 sqft 3BHK → ₹85 Lakh + GST\n   📅 Ready ✅\n\n7. Revanta — Shela\n   📐 1510 sqft 3BHK → ₹64 Lakh + GST\n   📅 Ready ✅\n\n🏢 COMMERCIAL\n1. Centrica — GIFT City Domestic\n   📐 1769 sqft Office → ₹1.82 Cr + GST\n   📐 3574 sqft Showroom → ₹10.3 Cr + GST\n   📅 Dec 2029\n\n2. Business Gateway — Vaishnodevi Circle\n   📐 4100 sqft Office/Showroom → ₹3.45 Cr + GST\n   📅 Ready ✅\n\n3. Twin Tower — GIFT City SEZ\n   📐 1800 sqft Offices → ₹1.90 Cr + GST\n   📅 Dec 2031\n\n4. Shilp Sacred — Iskon-Ambli\n   📐 1500 sqft Office → ₹1.37 Cr + GST\n   📐 2600 sqft Showroom → ₹7.00 Cr + GST\n   📅 May 2030\n\n5. Shilp One — Shilaj Circle\n   📐 1944 sqft Showroom → ₹2.35 Cr + GST\n\n🏭 INDUSTRIAL / PLOTS\n1. Industrial Park — Charodi\n   📐 3500 sqft Plot → ₹2.62 Cr + GST\n   📅 Ready ✅\n\n2. Shilp Olives — Sanand Nalsarovar Rd\n   📐 6456+ sqft Plot → ₹1.83 Cr + GST\n   📅 Dec 2026\n\n✅ All RERA Registered | 📞 +91 9898211567",
     quickReplies: ["Commercial Projects", "Residential Projects", "View Pricing", "Make Enquiry"],
     link: { label: "View All Projects →", path: "/shilp-projects" },
   },
@@ -583,7 +603,7 @@ const SYSTEM_PROMPT = `You are Sandeep, a real human sales executive at Shilp Gr
 - Founded: 2004 by Mr. Yash Brahmbhatt (Founder & CEO)
 - Co-leadership: Mrs. Snehal Brahmbhatt (COO – Marketing, PR & Communications; also founder of Snehshilp Foundation NGO)
 - HQ: Shilp House, Rajpath Rangoli Road, Opposite Rajpath Club, Bodakdev, Ahmedabad – 380054, Gujarat, India
-- 50+ projects completed, 14+ ongoing, 20+ years, 10,000+ happy customers, 11+ awards, RERA registered
+- 52 projects completed, 14 ongoing, 20+ years, 10,000+ happy customers, 11+ awards, RERA registered
 - Pioneer developer on Sindhu Bhavan Road and first developer at GIFT City, Gandhinagar
 - Tagline: Quality, Integrity & Authenticity
 
@@ -602,7 +622,7 @@ Total delivered: 50+ projects | 10,000+ happy customers
 
 ## Active / For-Sale Projects — Complete Data
 
-### RESIDENTIAL (8 projects)
+### RESIDENTIAL (7 projects)
 
 1. Shilp Residency — Gota | Possession: 30 Jun 2027
    - 2050 sqft 3BHK | ₹1.18 Cr + GST charges
@@ -629,10 +649,7 @@ Total delivered: 50+ projects | 10,000+ happy customers
    - 1511 sqft 2BHK | ₹1.50 Cr + GST charges
    - 1875 sqft 3BHK | ₹1.85 Cr + GST charges
 
-8. Shilp Paradise 2 — Vejalpur | Possession: 31 Aug 2026
-   - 3750 sqft 4BHK | ₹2.99 Cr + GST charges
-
-### COMMERCIAL (6 projects)
+### COMMERCIAL (5 projects)
 
 8. Centrica — GIFT City Domestic | Possession: 31 Dec 2029
    - 1769 sqft Office | ₹1.82 Cr + GST charges
@@ -648,18 +665,15 @@ Total delivered: 50+ projects | 10,000+ happy customers
 11. Shilp One — Shilaj Circle | Possession: TBD
     - 1944 sqft Showroom | ₹2.35 Cr + GST charges
 
-12. Shilp Serene 2 — Judges Bungalow | Possession: TBD
-    - 2217 sqft Showroom | ₹4.65 Cr + GST charges
-
-13. Twin Tower — GIFT City SEZ | Possession: 31 Dec 2031
+12. Twin Tower — GIFT City SEZ | Possession: 31 Dec 2031
     - 1800 sqft Offices | ₹1.90 Cr + GST charges
 
 ### INDUSTRIAL / PLOTS (2 projects)
 
-14. Industrial Park — Industrial Charodi | Status: READY
+13. Industrial Park — Industrial Charodi | Status: READY
     - 3500 sqft Plot | ₹2.62 Cr + GST charges
 
-15. Shilp Olives — Sanand Nalsarovar Road | Possession: Dec 2026
+14. Shilp Olives — Sanand Nalsarovar Road | Possession: Dec 2026
     - From 6456 sqft Plot | ₹1.83 Cr + GST charges
 
 PRICING NOTES:
@@ -694,7 +708,6 @@ COMMERCIAL:
 - Twin Tower (GIFT City SEZ): https://www.google.com/maps/search/?api=1&query=Shilp+Twin+Tower+GIFT+City+SEZ+Gandhinagar
 - Shilp Sacred (Iskon-Ambli): https://www.google.com/maps/search/?api=1&query=Shilp+Sacred+Iskon+Ambli+Ahmedabad
 - Shilp One (Shilaj Circle): https://www.google.com/maps/search/?api=1&query=Shilp+One+Shilaj+Circle+Ahmedabad
-- Shilp Serene 2 (Judges Bungalow): https://www.google.com/maps/search/?api=1&query=Shilp+Serene+2+Judges+Bungalow+Ahmedabad
 - Industrial Park (Charodi): https://www.google.com/maps/search/?api=1&query=Industrial+Park+Charodi+Ahmedabad
 INDUSTRIAL/PLOTS:
 - Shilp Olives (Sanand Nalsarovar): https://www.google.com/maps/search/?api=1&query=Shilp+Olives+Sanand+Nalsarovar+Road+Ahmedabad
@@ -711,19 +724,20 @@ INDUSTRIAL/PLOTS:
 - For pricing always say "+ GST charges applicable" and add: "For exact rates, call +91 9898211567"
 - PRICE-ONLY RULE: If user asks about pricing/rates in general (e.g. "price?", "rates batao", "kitna price hai", "all prices") → show ONLY project name + smallest price. Nothing else. Format: [emoji] [Name] – ₹[price] + GST charges. Keep it short.
 - PROJECT DETAIL RULE: If user asks about a specific project by name → then give full details: location, sqft, type, status/possession, map link.
-- When listing multiple projects use number emojis 1️⃣ 2️⃣ 3️⃣
-- For PRICE-ONLY queries format: [emoji] [Name] – ₹[price] + GST charges
+- When listing multiple projects use plain numbers: 1. 2. 3. (NOT emoji numbers)
+- For PRICE-ONLY queries format: [Name] – ₹[price] + GST charges
 - For ALL PROJECTS / project list, use EXACTLY this multi-line format per project:
-  [emoji] [Name] — [Location]
+  [N]. [Name] — [Location]
      📐 [sqft] [type] → ₹[price] + GST charges
      📐 [sqft] [type] → ₹[price] + GST charges  (repeat for each size)
      📅 [Month YYYY]  OR  📅 Ready ✅
   Example:
-  1️⃣ Shilp Residency — Gota
+  1. Shilp Residency — Gota
      📐 2050 sqft 3BHK → ₹1.18 Cr + GST charges
      📐 3341 sqft 4BHK → ₹1.94 Cr + GST charges
      📅 Jun 2027
   CRITICAL: Use 📐 for each size/price line. Use 📅 for possession. Do NOT use pipe | format.
+  NUMBERING RULE: When listing projects under multiple categories, RESTART numbering at 1. for each category (e.g. Residential 1. 2. ... 7., then Commercial RESTARTS 1. 2. ... 6., then Plots RESTARTS 1. 2.). Never number beyond 9. in a single category.
 - CRITICAL: Do NOT put any URL or map link inside a project listing line. URLs must ONLY appear on their own separate line, never mixed with project name/location.
 - STRICT TOPIC RULE: You ONLY answer questions related to Shilp Group — projects, pricing, locations, site visits, careers, about the company, team, awards, RERA, amenities, and contact info.
 - OFF-TOPIC RULE: If the user asks about ANYTHING outside of Shilp Group (e.g. other companies, general knowledge, politics, movies, cricket, weather, recipes, other builders, other cities unrelated to Shilp, etc.) — politely decline and redirect. Use this exact format:
@@ -739,7 +753,9 @@ INDUSTRIAL/PLOTS:
 - IMPORTANT: Output URLs as plain text only (https://...). Do NOT use markdown [text](url) format. UI renders them as buttons automatically.
 - When listing all projects, categorize them: Residential | Commercial | Industrial/Plots
 - Do NOT use markdown bold (**text**) or headers. Plain text with emojis for warmth.
-- Do NOT use 1. or 1) numbering. Use ONLY emoji numbers 1️⃣ 2️⃣ 3️⃣...`;
+- Use plain numbers 1. 2. 3. for numbered lists. Do NOT use emoji numbers like 1️⃣ 2️⃣ 3️⃣.
+- BROCHURE/PHOTOS RULE: If user asks for brochure, photos, pictures, images, floor plan, gallery, pdf, catalogue of any project → say: "Photos and brochure are available on our website! 📸 You can also share your WhatsApp number and we'll send it directly. 📲 WhatsApp: +91 9909961234 | Call: +91 9898211567"
+- TOTAL PROJECTS RULE: If user asks how many projects, total projects, kitne project, completed projects, ongoing projects → clearly state: Shilp Group has completed 52 projects and currently has 14 ongoing projects. Total 66 projects overall.`;
 
 
 // Multi-turn conversation history
@@ -760,7 +776,7 @@ async function askGroq(userMessage: string): Promise<string | null> {
       },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant", // 🆓 Free & blazing fast (500 tokens/sec!)
-        max_tokens: 600,
+        max_tokens: 1400,
         temperature: 0.7,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
@@ -842,9 +858,11 @@ const welcomeMsg: Message = {
 // ─── Chatbot Component ────────────────────────────────────────────────────────
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([welcomeMsg]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 640);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -862,9 +880,19 @@ const Chatbot = () => {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   const addMessage = (msg: Omit<Message, "id" | "timestamp">) => {
     setMessages((prev) => [...prev, { ...msg, id: Date.now() + Math.random(), timestamp: new Date() }]);
   };
+
+  const handleClose = () => { setOpen(false); setExpanded(false); };
 
   const handleSend = async (text?: string) => {
     const raw = (text ?? input).trim();
@@ -899,30 +927,63 @@ const Chatbot = () => {
 
   return (
     <>
-      {/* ── Centered Chat Modal ── */}
+      {/* ── Chat Panel (Right Drawer / Expanded Modal) ── */}
       {open && (
-        <div
-          className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center sm:p-4"
-          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-        >
-        <div
-          className="chat-window flex flex-col overflow-hidden w-full sm:rounded-[28px] rounded-t-[28px]"
-          style={{
-            maxWidth: "680px",
-            height: "clamp(480px, 90dvh, 760px)",
-            background: "#FAFAFA",
-            border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: "0 -4px 60px rgba(0,0,0,0.3), 0 40px 80px rgba(0,0,0,0.4)",
-          }}
-        >
+        <>
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 z-[9997]"
+            style={{
+              background: (expanded || isMobile) ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.18)",
+              backdropFilter: (expanded || isMobile) ? "blur(6px)" : "none",
+              WebkitBackdropFilter: (expanded || isMobile) ? "blur(6px)" : "none",
+              transition: "background 0.3s",
+            }}
+            onClick={handleClose}
+          />
+          <div
+            className="chat-window fixed z-[9998] flex flex-col overflow-hidden"
+            style={expanded ? {
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "min(840px, 95vw)",
+              height: "clamp(520px, 92dvh, 920px)",
+              borderRadius: "28px",
+              background: "#FAFAFA",
+              border: "1px solid rgba(255,255,255,0.12)",
+              boxShadow: "0 40px 80px rgba(0,0,0,0.45)",
+            } : isMobile ? {
+              bottom: 0,
+              left: 0,
+              right: 0,
+              top: "auto",
+              transform: "none",
+              width: "100%",
+              height: "clamp(380px, 88dvh, 88dvh)",
+              borderRadius: "20px 20px 0 0",
+              background: "#FAFAFA",
+              border: "none",
+              boxShadow: "0 -10px 40px rgba(0,0,0,0.3)",
+            } : {
+              top: "50%",
+              right: "16px",
+              transform: "translateY(-50%)",
+              width: "min(430px, calc(100vw - 32px))",
+              height: "clamp(480px, 85dvh, 780px)",
+              borderRadius: "20px",
+              background: "#FAFAFA",
+              border: "1px solid rgba(255,255,255,0.1)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.28)",
+            }}
+          >
           {/* ── Header ── */}
           <div
             className="flex-shrink-0 relative overflow-hidden"
             style={{
               background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%)",
-              borderRadius: "28px 28px 0 0",
-              padding: "20px 20px 0",
+              borderRadius: expanded ? "28px 28px 0 0" : (isMobile ? "20px 20px 0 0" : "20px 20px 0 0"),
+              padding: isMobile ? "16px 16px 0" : "20px 20px 0",
             }}
           >
             {/* decorative shimmer lines */}
@@ -968,7 +1029,15 @@ const Chatbot = () => {
                   <p className="text-white/40 text-[9px] font-semibold tracking-wide">2004</p>
                 </div>
                 <button
-                  onClick={() => setOpen(false)}
+                  onClick={() => setExpanded(v => !v)}
+                  className="w-9 h-9 hidden sm:flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all duration-200 active:scale-90"
+                  style={{ borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}
+                  title={expanded ? "Collapse" : "Expand chat"}
+                >
+                  {expanded ? <TbArrowsMinimize className="text-[15px]" /> : <TbArrowsMaximize className="text-[15px]" />}
+                </button>
+                <button
+                  onClick={handleClose}
                   className="w-9 h-9 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all duration-200 active:scale-90"
                   style={{ borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}
                 >
@@ -1003,7 +1072,7 @@ const Chatbot = () => {
           {/* ── Messages ── */}
           <div
             className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
-            style={{ background: "linear-gradient(180deg, #f4f4f4 0%, #efefef 100%)" }}
+            style={{ background: "linear-gradient(180deg, #f4f4f4 0%, #efefef 100%)", WebkitOverflowScrolling: "touch" } as React.CSSProperties}
           >
             {messages.map((msg, idx) => {
               const isUser = msg.from === "user";
@@ -1042,7 +1111,7 @@ const Chatbot = () => {
                   </div>
                   {msg.link && (
                     <button
-                      onClick={() => { navigate(msg.link!.path); setOpen(false); }}
+                      onClick={() => { navigate(msg.link!.path); handleClose(); }}
                       className="flex items-center gap-1.5 mt-2 mx-1 text-[10px] font-bold tracking-widest uppercase transition-all duration-200 hover:-translate-y-0.5 hover:opacity-100 opacity-70"
                       style={{
                         color: "#0a0a0a",
@@ -1121,10 +1190,11 @@ const Chatbot = () => {
           </div>
 
           <div
-            className="flex-shrink-0 px-4 pt-3 pb-4"
+            className="flex-shrink-0 px-4 pt-3"
             style={{
               background: "#fff",
               borderTop: "1px solid rgba(0,0,0,0.06)",
+              paddingBottom: isMobile ? "max(16px, env(safe-area-inset-bottom))" : "16px",
             }}
           >
             <div
@@ -1173,12 +1243,15 @@ const Chatbot = () => {
               </p>
             </div>
           </div>
-        </div>
-        </div>
+          </div>
+        </>
       )}
 
       {/* ── Chat FAB ── */}
-      <div className={`fixed bottom-6 right-4 sm:right-6 z-[9999] flex-col items-end gap-2 ${open ? 'hidden sm:flex' : 'flex'}`}>
+      <div
+        className={`fixed right-4 sm:right-6 z-[9999] flex-col items-end gap-2 ${open ? 'hidden' : 'flex'}`}
+        style={{ bottom: "max(24px, env(safe-area-inset-bottom, 24px))" }}
+      >
         {/* tooltip / label when closed — hidden on mobile to save space */}
         {!open && (
           <div
