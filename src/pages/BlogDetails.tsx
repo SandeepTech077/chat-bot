@@ -10,7 +10,7 @@ import { getBlogData } from "../utils/helper";
 import { BlogData } from "../types/blogs.types";
 import LoaderWithStyles from "../components/Loader/Loader";
 import BannerImg from "../components/BannerImg";
-import MainBanner from "../assets/blogs/BlogsBanner/Banner.png";
+import MainBanner from "../assets/blogs/BlogsBanner/banner.png";
 import mainMobileBanner from "../assets/blogs/BlogsBanner/mobile-banner.png";
 import BlogBanner from "../components/Blogs/BlogBanner";
 import profile from "../assets/Icons/shilpprofile.svg";
