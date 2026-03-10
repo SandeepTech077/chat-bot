@@ -31,9 +31,9 @@ import gallery4 from "./gallery/image-4.png"
 import gallery5 from "./gallery/image-5.png"
 
 // video
-import project1 from "./project_updates/Img1.jpg"
-import project2 from "./project_updates/Img2.jpg"
-import project3 from "./project_updates/Img3.jpg"
+import project1 from "./project_updates/img1.jpg"
+import project2 from "./project_updates/img2.jpg"
+import project3 from "./project_updates/img3.jpg"
 
 export const BopalAmbli = {
     baCard,
