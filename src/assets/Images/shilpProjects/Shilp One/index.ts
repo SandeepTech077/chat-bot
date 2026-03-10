@@ -1,6 +1,6 @@
 //
 import about from "./About/about-banner-2.webp"
-import card from "./About/card-G3Qta6BN.webp"
+import card from "./About/card-g3qta6bn.webp"
 //
 import oneBanner from "./Banner/shilp-one.webp"
 import mobileBanner from "./Banner/mobile-banner-5.webp"
