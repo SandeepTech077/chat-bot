@@ -1,13 +1,7 @@
-import Timeline from "@mui/lab/Timeline";
-import TimelineItem from "@mui/lab/TimelineItem";
-import TimelineSeparator from "@mui/lab/TimelineSeparator";
-import TimelineConnector from "@mui/lab/TimelineConnector";
-import TimelineContent from "@mui/lab/TimelineContent";
-import TimelineDot from "@mui/lab/TimelineDot";
+import { useRef, useState, useMemo } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import Images from "../assets/Images";
 import BannerImg from "../components/BannerImg";
-import Title from "../components/Common/Title";
-import { GoDotFill } from "react-icons/go";
 
 import aaron from "../assets/Images/project-tree/aaron-residential-tower.webp";
 import address from "../assets/Images/project-tree/address-location-building.webp";
@@ -541,105 +535,236 @@ const projectData = [
   ],
 ];
 
-const ProjectTree = () => {
-  const renderDesktopItem = (item: any) => {
-    if (item.image) {
-      return (
-        <div className="hidden lg:flex items-center justify-between p-5 lg:w-[250px] xl:w-[290px] h-[150px] bg-white transition-all duration-300 hover:shadow-lg rounded-lg">
-          <div className="flex flex-col items-start space-y-2 w-[70%]">
-            {/* Year Badge */}
-            <div className="border rounded-[20px] py-1 px-4 flex items-center gap-2 w-[100px] h-[30px] text-center justify-center">
-              <GoDotFill />
-              <span className="w-full h-full flex items-center justify-center">{item.year}</span>
-            </div>
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-            {/* Title */}
-            <div className="w-full h-[24px] flex items-center">
-              <h2 className="text-sm xl:text-base text-left truncate">{item.title}</h2>
-            </div>
+const TYPE_COLORS: Record<string, string> = {
+  Residential: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Residental: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Commercial: "bg-blue-50 text-blue-700 border-blue-200",
+  Commerical: "bg-blue-50 text-blue-700 border-blue-200",
+  Plot: "bg-amber-50 text-amber-700 border-amber-200",
+  Plots: "bg-amber-50 text-amber-700 border-amber-200",
+};
 
-            {/* Location */}
-            <div className="w-full h-[24px] flex items-center">
-              <span className="text-sm text-gray-500 text-left truncate">{item.location}</span>
-            </div>
+const normaliseType = (t: string) => {
+  if (/resid/i.test(t)) return "Residential";
+  if (/comm/i.test(t)) return "Commercial";
+  return "Plot";
+};
 
-            {/* Type */}
-            <div className="w-full h-[24px] flex items-center">
-              <span className="text-sm truncate">{item.type}</span>
-            </div>
-          </div>
+const FILTER_OPTIONS = ["All", "Residential", "Commercial", "Plot"] as const;
+type Filter = (typeof FILTER_OPTIONS)[number];
 
-          {/* Image */}
-          <div className="w-[70px] h-[70px] flex-shrink-0">
-            <img src={item.image} loading="lazy" className="w-full h-full border rounded-full object-cover" alt="" />
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
+interface ProjectItem {
+  year: string;
+  title: string;
+  location: string;
+  type: string;
+  alt: string;
+  image: string;
+}
 
-
-  const renderMobileTimelineItem = (item: any) => (
-    <TimelineItem>
-      <TimelineSeparator>
-        <TimelineDot
-          style={{ borderRadius: "4px", width: "10px", height: "10px" }}
-        />
-        <div className="w-10 border-top absolute" />
-        <TimelineConnector className="timeline-connector" />
-      </TimelineSeparator>
-      <TimelineContent>
-        <div className="bg-white transition-all duration-300 hover:shadow-lg  rounded-lg p-4 mb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col space-y-2">
-              <span className="inline-block border rounded-[20px] px-4 py-1 text-sm w-[70px]">
-                {item.year}
-              </span>
-              <h2 className="text-lg font-medium">{item.title}</h2>
-              <span className="text-sm text-gray-500">{item.location}</span>
-              <span className="text-sm">{item.type}</span>
-            </div>
-            <img
-              src={item.image}
-              className="w-16 h-16 border rounded-full object-cover"
-              alt={item.title}
-            />
-          </div>
-        </div>
-      </TimelineContent>
-    </TimelineItem>
-  );
+/* ── Year-group row with staggered card entrance ── */
+const YearGroup = ({
+  year,
+  items,
+  index,
+}: {
+  year: string;
+  items: ProjectItem[];
+  index: number;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
-    <section className="project-tree overflow-hidden ">
-      <BannerImg image={Images.projectTreeBanner} />
-      <div className="container-base top-spacing space-y-6 " style={{ marginLeft: "20px" }}>
-        <Title text="Explore" />
-        <h2 className="text-3xl">Our Project Tree</h2>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0 }}
+      animate={inView ? { opacity: 1 } : {}}
+      transition={{ duration: 0.4, ease: EASE }}
+      className="flex gap-4 sm:gap-8"
+    >
+      {/* Year column */}
+      <div className="flex flex-col items-center gap-0 shrink-0 pt-1">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={inView ? { scale: 1 } : {}}
+          transition={{ duration: 0.5, ease: EASE, delay: index * 0.03 }}
+          className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shrink-0"
+        >
+          <div className="w-2 h-2 rounded-full bg-white" />
+        </motion.div>
+        <div className="flex-1 w-[2px] bg-[#EDEAEA] mt-2" />
       </div>
 
-      <div className="bg-[#f6f6f6] hidden lg:block top-spacing">
-        <div className="mapWrapper pb-20 ">
-          {projectData.map((row, rowIndex) => (
-            <div key={rowIndex} className="row">
-              {row.map((item, itemIndex) => (
-                <div key={itemIndex} className="itemBar">
-                  <div className="itemInfo">{renderDesktopItem(item)}</div>
-                </div>
-              ))}
-            </div>
+      {/* Content */}
+      <div className="pb-10 flex-1 min-w-0">
+        <motion.span
+          initial={{ opacity: 0, x: -12 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.55, ease: EASE, delay: 0.05 + index * 0.03 }}
+          className="inline-block text-xs font-bold tracking-[0.18em] uppercase text-customGrey mb-4"
+        >
+          {year}
+        </motion.span>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {items.map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.55, ease: EASE, delay: 0.08 + i * 0.07 + index * 0.03 }}
+              className="bg-white border border-[#EDEAEA] rounded-xl p-4 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
+            >
+              <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-[#EDEAEA] group-hover:border-black/20 transition-colors duration-300">
+                <img
+                  src={item.image}
+                  loading="lazy"
+                  alt={item.alt || item.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-semibold leading-tight truncate mb-1">{item.title}</h3>
+                <p className="text-xs text-customGrey truncate mb-2">{item.location}</p>
+                <span
+                  className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                    TYPE_COLORS[item.type] ?? "bg-gray-50 text-gray-600 border-gray-200"
+                  }`}
+                >
+                  {normaliseType(item.type)}
+                </span>
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>
+    </motion.div>
+  );
+};
 
-      <div className="lg:hidden block px-4 py-8 bg-[#f6f6f6] top-spacing">
-        <Timeline>
-          {projectData.flat().map((item) => renderMobileTimelineItem(item))}
-        </Timeline>
+const ProjectTree = () => {
+  const [activeFilter, setActiveFilter] = useState<Filter>("All");
+  const headerRef = useRef<HTMLDivElement>(null);
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
+
+  /* Flatten, normalise, and group by year (desc) */
+  const grouped = useMemo(() => {
+    const flat = projectData.flat() as ProjectItem[];
+    const filtered =
+      activeFilter === "All"
+        ? flat
+        : flat.filter((p) => normaliseType(p.type) === activeFilter);
+    const map = new Map<string, ProjectItem[]>();
+    for (const p of filtered) {
+      const list = map.get(p.year) ?? [];
+      list.push(p);
+      map.set(p.year, list);
+    }
+    return Array.from(map.entries()).sort((a, b) => Number(b[0]) - Number(a[0]));
+  }, [activeFilter]);
+
+  const totalCount = projectData.flat().length;
+
+  return (
+    <section className="overflow-hidden">
+      <BannerImg image={Images.projectTreeBanner} />
+
+      {/* Header */}
+      <div ref={headerRef} className="container-base top-spacing">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={headerInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="flex items-center gap-3 mb-4"
+        >
+          <motion.span
+            initial={{ scaleX: 0 }}
+            animate={headerInView ? { scaleX: 1 } : {}}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+            className="inline-block h-[2px] w-8 bg-black origin-left"
+          />
+          <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-customGrey">
+            Since 2004
+          </span>
+        </motion.div>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
+          className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-2"
+        >
+          Our{" "}
+          <span className="relative inline-block">
+            Project Tree
+            <motion.span
+              initial={{ scaleX: 0 }}
+              animate={headerInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.9, ease: EASE, delay: 0.55 }}
+              className="absolute -bottom-1 left-0 h-[3px] w-full bg-black origin-left"
+            />
+          </span>
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={headerInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
+          className="text-customGrey text-sm mt-3"
+        >
+          {totalCount}+ projects delivered across Ahmedabad & Gandhinagar.
+        </motion.p>
+
+        {/* Filter tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: EASE, delay: 0.4 }}
+          className="flex flex-wrap gap-2 mt-6"
+        >
+          {FILTER_OPTIONS.map((f) => (
+            <button
+              key={f}
+              onClick={() => setActiveFilter(f)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-300 ${
+                activeFilter === f
+                  ? "bg-black text-white border-black"
+                  : "bg-white text-customGrey border-[#EDEAEA] hover:border-black/40 hover:text-black"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Timeline */}
+      <div className="bg-[#F9F9F9] top-spacing pb-4">
+        <div className="container-base">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeFilter}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {grouped.length === 0 ? (
+                <p className="text-customGrey text-sm py-16 text-center">No projects found.</p>
+              ) : (
+                grouped.map(([year, items], index) => (
+                  <YearGroup key={year} year={year} items={items} index={index} />
+                ))
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );
 };
 
 export default ProjectTree;
+
