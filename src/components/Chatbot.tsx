@@ -42,6 +42,7 @@ const PROJECT_MAP_LINKS: Record<string, string> = {
   "northsky":           "https://www.google.com/maps/search/?api=1&query=Northsky+GIFT+City+SEZ+Gandhinagar",
   "shilp celestial":    "https://www.google.com/maps/search/?api=1&query=Shilp+Celestial+Vaishnodevi+Circle+Ahmedabad",
   "skyline":            "https://www.google.com/maps/search/?api=1&query=Skyline+Adani+Shantigram+Ahmedabad",
+  "shilp paradise 2":   "https://www.google.com/maps/search/?api=1&query=Shilp+Paradise+2+Vejalpur+Ahmedabad",
   "shilp paradise":     "https://www.google.com/maps/search/?api=1&query=Shilp+Paradise+Sindhu+Bhavan+Road+Ahmedabad",
   "shilp serene 2":     "https://www.google.com/maps/search/?api=1&query=Shilp+Serene+2+Judges+Bungalow+Ahmedabad",
   "shilp serene":       "https://www.google.com/maps/search/?api=1&query=Shilp+Serene+Shilaj+Ahmedabad",
@@ -558,15 +559,15 @@ const knowledgeBase: ResponseEntry[] = [
   },
   {
     keywords: ["project", "projects", "saare", "sab", "all", "kitne", "total", "list", "portfolio", "properties", "property", "real estate", "sabhi", "detail", "details", "batao", "btao", "bataiye", "dikhao", "show"],
-    response: "🏗️ Shilp Group — All 15 Projects:\n\n🏠 RESIDENTIAL (7)\n• Shilp Residency — Gota (Jun 2027)\n• Shilp Serene — Shilaj ✅ Ready\n• Shilp Paradise — Sindhubhavan (Jun 2025)\n• Skyline — Adani Shantigram (Sep 2029)\n• Shilp Celestial — Vaishnodevi (Jul 2030)\n• Revanta — Shela ✅ Ready\n• Northsky — GIFT City SEZ (Mar 2028)\n\n🏢 COMMERCIAL (6)\n• Centrica — GIFT City Domestic (Dec 2029)\n• Business Gateway — Vaishnodevi ✅ Ready\n• Shilp Sacred — Iskon-Ambli (May 2030)\n• Shilp One — Shilaj Circle\n• Shilp Serene 2 — Judges Bungalow\n• Twin Tower — GIFT City SEZ (Dec 2031)\n\n🏭 INDUSTRIAL / PLOTS (2)\n• Industrial Park — Charodi ✅ Ready\n• Shilp Olives — Sanand Nalsarovar Rd (Dec 2026)\n\n✅ All RERA Registered | 📞 +91 9898211567",
+    response: "🏗️ Shilp Group — All Current Projects:\n\n🏠 RESIDENTIAL\n1️⃣ Shilp Residency — Gota\n   📐 2050 sqft 3BHK → ₹1.18 Cr + GST\n   📐 2360 sqft 3BHK → ₹1.37 Cr + GST\n   📐 3341 sqft 4BHK → ₹1.94 Cr + GST\n   📅 Jun 2027\n\n2️⃣ Northsky — GIFT City SEZ\n   📐 1511 sqft 2BHK → ₹1.50 Cr + GST\n   📐 1875 sqft 3BHK → ₹1.85 Cr + GST\n   📅 Mar 2028\n\n3️⃣ Shilp Celestial — Vaishnodevi\n   📐 2379 sqft 3BHK → ₹1.28 Cr + GST\n   📐 3153 sqft 4BHK → ₹1.70 Cr + GST\n   📅 Jul 2030\n\n4️⃣ Skyline — Adani Shantigram\n   📐 3071 sqft 4BHK → ₹1.90 Cr + GST\n   📅 Sep 2029\n\n5️⃣ Shilp Paradise — Sindhubhavan\n   📐 3380 sqft 4BHK → ₹2.69 Cr + GST\n   📅 Jun 2025\n\n6️⃣ Shilp Paradise 2 — Vejalpur\n   📐 3750 sqft 4BHK → ₹2.99 Cr + GST\n   📅 Aug 2026\n\n7️⃣ Shilp Serene — Shilaj\n   📐 1750 sqft 3BHK → ₹85 Lakh + GST\n   📅 Ready ✅\n\n8️⃣ Revanta — Shela\n   📐 1510 sqft 3BHK → ₹64 Lakh + GST\n   📅 Ready ✅\n\n🏢 COMMERCIAL\n1️⃣ Centrica — GIFT City Domestic\n   📐 1769 sqft Office → ₹1.82 Cr + GST\n   📐 3574 sqft Showroom → ₹10.3 Cr + GST\n   📅 Dec 2029\n\n2️⃣ Business Gateway — Vaishnodevi Circle\n   📐 4100 sqft Office/Showroom → ₹3.45 Cr + GST\n   📅 Ready ✅\n\n3️⃣ Twin Tower — GIFT City SEZ\n   📐 1800 sqft Office → ₹1.90 Cr + GST\n   📅 Dec 2031\n\n4️⃣ Shilp Sacred — Iskon-Ambli\n   📐 1500 sqft Office → ₹1.37 Cr + GST\n   📐 2600 sqft Showroom → ₹7.00 Cr + GST\n   📅 May 2030\n\n5️⃣ Shilp One — Shilaj Circle\n   📐 1944 sqft Showroom → ₹2.35 Cr + GST\n\n6️⃣ Shilp Serene 2 — Judges Bungalow\n   📐 2217 sqft Showroom → ₹4.65 Cr + GST\n\n🏭 INDUSTRIAL / PLOTS\n1️⃣ Industrial Park — Charodi\n   📐 3500 sqft Plot → ₹2.62 Cr + GST\n   📅 Ready ✅\n\n2️⃣ Shilp Olives — Sanand Nalsarovar Rd\n   📐 6456+ sqft Plot → ₹1.83 Cr + GST\n   📅 Dec 2026\n\n✅ All RERA Registered | 📞 +91 9898211567",
     quickReplies: ["Commercial Projects", "Residential Projects", "View Pricing", "Make Enquiry"],
     link: { label: "View All Projects →", path: "/shilp-projects" },
   },
 ];
 
 const fallback: Omit<ResponseEntry, "keywords"> = {
-  response: "Sorry, I didn't quite understand that. 😊\n\nAsk me about:\n• Projects • Pricing • Location\n• Contact • About Shilp Group\n• Careers & Blog",
-  quickReplies: ["All Projects", "Contact Us", "View Location", "View Pricing"],
+  response: "Sorry, I can only help with Shilp Group related queries! 😊\n\nYou can ask me about:\n• Our projects & pricing\n• Site visits & locations\n• About Shilp Group\n• Contact & enquiries",
+  quickReplies: ["All Projects", "View Pricing", "Contact Us", "Site Visit Info"],
 };
 
 // ─── Groq AI Engine — 100% FREE ───────────────────────────────────────────────
@@ -586,7 +587,20 @@ const SYSTEM_PROMPT = `You are Sandeep, a real human sales executive at Shilp Gr
 - Pioneer developer on Sindhu Bhavan Road and first developer at GIFT City, Gandhinagar
 - Tagline: Quality, Integrity & Authenticity
 
-## All 15 Projects — Complete Data
+## Completed / Delivered Projects (for reference only — NOT for sale)
+These are projects Shilp has already delivered to customers. Mention them proudly when asked about track record or past work.
+
+2004–2010 era: Shilp Arcade (Jodhpur Cross Rd), Shilp Complex (Gurukul Rd), Shilp Corner, Shaligram (Vastrapur), Sashvat (Memnagar), Shilp Square A & B (Drive-in Rd), Shilp Annexe (ChandKheda), Shilp 3 & HCG Hospital (Science City), Shilp Aaron (Bopal), Silver Nest (Gota), Saral (Bopal), Parkview Green (Science City)
+
+2011–2015 era: Green City, Shilp Sapphire (Thaltej), Shilp City Square, Green View, Garden View, City Center & City Center 2 (Science City), Blossom Luxuria, Shilp Elanza (Thaltej), Shivalik Shilp 1 & 2, Shilp Aperia (Bopal-Ambli), Shilp Arista, Asian Square (Bodakdev)
+
+2016–2022 era: Shilp Satved (Bodakdev), Shilp Shaligram (Vastrapur), Shilp The Address (Shilaj Cross Rd), Shilp Zaveri (Shyamal), Shilp Epitome (Bodakdev), Shilp The Address, Shilp The Roots (Moti Devti — plots), Shilp Corporate Park (Rajpath Rangoli Rd), Shilp 14 (Rajpath Rd)
+
+2022–2024 era: Shilp Business Gateway (Vaishnodevi) ✅ Delivered, Shilp Revanta (Shela) ✅ Delivered, Shilp Industrial Park (Changodar) ✅ Delivered, Shilp Serene (Shilaj) ✅ Delivered, Shilp One (Rajpath Cross Rd) ✅ Delivered, Shilp Incubation Center (GIFT City) ✅ Delivered
+
+Total delivered: 50+ projects | 10,000+ happy customers
+
+## Active / For-Sale Projects — Complete Data
 
 ### RESIDENTIAL (8 projects)
 
@@ -614,6 +628,9 @@ const SYSTEM_PROMPT = `You are Sandeep, a real human sales executive at Shilp Gr
 7. Northsky — GIFT City SEZ | Possession: 31 Mar 2028
    - 1511 sqft 2BHK | ₹1.50 Cr + GST charges
    - 1875 sqft 3BHK | ₹1.85 Cr + GST charges
+
+8. Shilp Paradise 2 — Vejalpur | Possession: 31 Aug 2026
+   - 3750 sqft 4BHK | ₹2.99 Cr + GST charges
 
 ### COMMERCIAL (6 projects)
 
@@ -689,14 +706,35 @@ INDUSTRIAL/PLOTS:
 - If they ask about a specific project, give THAT project's map link first, then head office map link.
 
 ## Response Rules
-- LANGUAGE RULE: Respond in ENGLISH by default. Switch to Hinglish only if the user writes 3+ Hindi/Hinglish words. Never reply in Devanagari script.
+- LANGUAGE RULE: ALWAYS reply in ENGLISH no matter what language the user writes in. You can understand Hindi, Hinglish, and Gujarati input — but your response MUST ALWAYS be in English only. Never use Devanagari script, Gujarati script, or Hindi/Gujarati words in your responses.
 - Keep responses SHORT and conversational — under 200 words. Don't dump all info at once.
 - For pricing always say "+ GST charges applicable" and add: "For exact rates, call +91 9898211567"
 - PRICE-ONLY RULE: If user asks about pricing/rates in general (e.g. "price?", "rates batao", "kitna price hai", "all prices") → show ONLY project name + smallest price. Nothing else. Format: [emoji] [Name] – ₹[price] + GST charges. Keep it short.
 - PROJECT DETAIL RULE: If user asks about a specific project by name → then give full details: location, sqft, type, status/possession, map link.
-- When listing multiple projects use number emojis 1️⃣ 2️⃣ 3️⃣ and format for PRICE queries: [emoji] [Name] – ₹[price] + GST charges
+- When listing multiple projects use number emojis 1️⃣ 2️⃣ 3️⃣
+- For PRICE-ONLY queries format: [emoji] [Name] – ₹[price] + GST charges
+- For ALL PROJECTS / project list, use EXACTLY this multi-line format per project:
+  [emoji] [Name] — [Location]
+     📐 [sqft] [type] → ₹[price] + GST charges
+     📐 [sqft] [type] → ₹[price] + GST charges  (repeat for each size)
+     📅 [Month YYYY]  OR  📅 Ready ✅
+  Example:
+  1️⃣ Shilp Residency — Gota
+     📐 2050 sqft 3BHK → ₹1.18 Cr + GST charges
+     📐 3341 sqft 4BHK → ₹1.94 Cr + GST charges
+     📅 Jun 2027
+  CRITICAL: Use 📐 for each size/price line. Use 📅 for possession. Do NOT use pipe | format.
 - CRITICAL: Do NOT put any URL or map link inside a project listing line. URLs must ONLY appear on their own separate line, never mixed with project name/location.
-- Answer ALL questions — never refuse. For non-Shilp topics, answer briefly then bring conversation back to Shilp.
+- STRICT TOPIC RULE: You ONLY answer questions related to Shilp Group — projects, pricing, locations, site visits, careers, about the company, team, awards, RERA, amenities, and contact info.
+- OFF-TOPIC RULE: If the user asks about ANYTHING outside of Shilp Group (e.g. other companies, general knowledge, politics, movies, cricket, weather, recipes, other builders, other cities unrelated to Shilp, etc.) — politely decline and redirect. Use this exact format:
+  "Sorry, I can only help with Shilp Group related queries! 😊
+  
+  You can ask me about:
+  • Our projects & pricing
+  • Site visits & locations
+  • About Shilp Group
+  • Contact & enquiries"
+- Never answer general knowledge, trivia, competitor info, or anything unrelated to Shilp Group. Always redirect warmly.
 - NEVER invent, modify, or guess any URL or map link. Only use exact links listed above.
 - IMPORTANT: Output URLs as plain text only (https://...). Do NOT use markdown [text](url) format. UI renders them as buttons automatically.
 - When listing all projects, categorize them: Residential | Commercial | Industrial/Plots
@@ -872,7 +910,7 @@ const Chatbot = () => {
           className="chat-window flex flex-col overflow-hidden w-full sm:rounded-[28px] rounded-t-[28px]"
           style={{
             maxWidth: "680px",
-            height: "clamp(560px, 88vh, 760px)",
+            height: "clamp(480px, 90dvh, 760px)",
             background: "#FAFAFA",
             border: "1px solid rgba(255,255,255,0.12)",
             boxShadow: "0 -4px 60px rgba(0,0,0,0.3), 0 40px 80px rgba(0,0,0,0.4)",
@@ -1140,11 +1178,11 @@ const Chatbot = () => {
       )}
 
       {/* ── Chat FAB ── */}
-      <div className="fixed bottom-6 right-4 sm:right-6 z-[9999] flex flex-col items-end gap-2">
-        {/* tooltip / label when closed */}
+      <div className={`fixed bottom-6 right-4 sm:right-6 z-[9999] flex-col items-end gap-2 ${open ? 'hidden sm:flex' : 'flex'}`}>
+        {/* tooltip / label when closed — hidden on mobile to save space */}
         {!open && (
           <div
-            className="flex items-center gap-2 px-3 py-1.5 select-none"
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 select-none"
             style={{
               background: "rgba(0,0,0,0.85)",
               backdropFilter: "blur(8px)",
