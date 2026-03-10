@@ -1,0 +1,3 @@
+Make sure to rebuild your Tailwind CSS styles. If you are using a build process, it should automatically watch for changes. If not, you can build manually:
+
+npx tailwindcss -o build.css --watch

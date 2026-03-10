@@ -1,0 +1,1 @@
+export type ProjectDataTypes = Record<string, any>;

@@ -1,0 +1,11 @@
+@media screen and (min-width: 767px) {
+  .slider-news-container {
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+  }
+
+  .slider-news-container .slick-list {
+    padding-left: 0px !important;
+  }
+}

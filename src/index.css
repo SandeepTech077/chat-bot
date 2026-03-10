@@ -1,0 +1,344 @@
+/* font family : montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Tailwind css Config */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-Montserrat;
+}
+
+
+@layer utilities {
+
+  .container-base {
+    @apply container mx-auto px-4
+  }
+  /* equal top spacing */
+  .top-spacing{
+   @apply mt-10 md:mt-20
+  }
+
+}
+/*--------------------------------------------------------------*/
+
+/* Blog Dots */
+/* Custom dots container outside the image */
+.custom-dash-container {
+  position: relative;
+  bottom: 0; /* Positioned below the image */
+}
+
+/* Custom slick dots (replaced with dashes) */
+.slick-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px; /* Space between dashes */
+  margin: 0;
+}
+
+.slick-dots li {
+  width: auto;
+}
+
+/* Replace default dot with a dark line */
+.custom-dot {
+  display: inline-block;
+  width: 30px;   
+  height: 6px;   
+  background-color: #EDEAEA; 
+  border-radius: 30px;
+}
+
+/* Active state for the selected slide */
+.slick-dots .slick-active .custom-dot {
+  background-color: black; /* White color for the active dash */
+}
+
+/* Hide every second dot */
+/* .slick-dots li:nth-child(2n) {
+  display: none;
+} */
+
+/*  */
+.slide-in{
+  position: fixed; 
+  top : 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  transform-origin: bottom;
+}
+
+.slide-out{
+  position: fixed; 
+  top : 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  transform-origin: top;
+}
+
+/* map */
+.map{
+  width: 100%;
+  height: 350px;
+}
+
+@media screen and (max-width : 640px)  {
+  .map{
+    height: 250px;
+  }
+}
+
+@media screen and (max-width : 480px)  {
+  .map{
+    height: 200px;
+  }
+}
+
+
+/* custom css for slick */
+@media screen and (min-width : 768px) {
+  .project-update-images  .slick-prev,.project-update-images .slick-next {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* photo provider */
+.PhotoView-Slider__Counter{
+  visibility: hidden !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* .hexagon {
+  border: 1px solid black;
+  aspect-ratio: 1/cos(30deg);
+  clip-path: polygon(50% -50%,100% 50%,50% 150%,0 50%);
+} */
+
+
+/* css for shape  */
+.social-media-section {
+  display: flex;
+  align-items: center;
+  gap: 20px; 
+  padding: 20px;
+  position: relative;
+  margin-bottom: 6rem;
+}
+
+@media screen and (max-width: 1280px) {
+  .social-media-section {
+    display: none;
+  }
+}
+
+.black-shape {
+  background-color: #000;
+  color: #fff;
+  padding: 20px 30px;
+  clip-path: polygon(0 0, 50% 0, 100% 100%, 0% 100%);
+  width: 30%;
+  height: 150px;
+  padding: auto;
+  border-radius: 20px 0px 0px 20px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+}
+
+.white-shape-wrapper {
+  position: relative;
+  width: 81%;
+  margin-left: auto;
+  filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* .white-shape-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 0.5));
+} */
+
+.white-shape {
+  position: relative;
+  clip-path: polygon(0 0, 100% 0%, 100% 100%, 18% 100%);
+  width: 100%;
+  height: 150px;
+  background-color: white;
+  border-radius: 0px 20px 20px 0px;
+  display: flex;
+  align-items: center;
+}
+
+.social-icons {
+  position: absolute;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  width: 75%;
+}
+
+.social-icons img {
+  object-fit: contain;
+  cursor: pointer;
+}
+
+/* project tree */
+
+.mapWrapper {
+  position: relative;
+  width: 70%;
+  left: 50%;
+  top: 0%;
+  transform: translateX(-50%);
+  /* padding-bottom: ; */
+}
+
+@media screen and (max-width : 1200px) {
+  .mapWrapper{
+    width: 80%;
+  }
+}
+
+.mapWrapper .row .itemBar {
+  position: relative;
+  display: inline-block;
+  width: 33.3333333333%;
+  height: 0.25em;
+  margin-top: 11.775em;
+  border-bottom: 2px dashed #BBBBBB; 
+}
+
+
+.mapWrapper .row .itemBar .itemInfo {
+  position: absolute;
+  /* width: 100%; */
+  bottom: -40px;
+  /* left: rem; */
+  /* right: 0; */
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+
+  /* height: 100px; */
+}
+
+@media screen and ( min-width : 1536px) {
+  .mapWrapper .row .itemBar .itemInfo {
+    left: 3rem;
+  }
+}
+
+
+
+.mapWrapper .row .itemBar .itemInfo:after {
+  content: "";
+  position: absolute;
+  width: 0.5em;
+  height: 0.25em;
+  border-radius: 3em 3em 0 0;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -0.25em;
+  transition: width 0.2s ease-in, height 0.2s ease-in;
+}
+.mapWrapper .row .itemBar:hover .itemInfo:after {
+  width: 2.5em;
+  height: 0.25em;
+  transition: width 0.2s ease-in, height 0.2s ease-in;
+}
+.mapWrapper .row .itemBar .itemDate {
+  position: absolute;
+  width: 100%;
+  font-size: 1.25em;
+  top: 0.25em;
+  text-align: center;
+  text-shadow: 1px 1px 2px black;
+}
+.mapWrapper .row:nth-child(2n) .itemBar:first-child:after {
+  content: "";
+  position: absolute;
+  width: 1.75em;
+  height: 12.60em;
+  right: 100%;
+  top: 2px;
+  border-radius: 7em 0 0 7em;
+  border: 2px solid #BBBBBB;
+  border-right: unset;
+  border-left-style: dashed;
+}
+.mapWrapper .row:nth-child(2n+1) .itemBar:last-child:after {
+  content: "";
+  position: absolute;
+  width: 1.75em;
+  height: 12.60em;
+  left: 100%;
+  top: 2px;
+  border-radius: 0 7em 7em 0;
+  border: 2px solid #BBBBBB;
+  border-left: unset;
+  border-right-style: dashed;
+}
+
+.mapWrapper .row:last-child .itemBar:after {
+  display: none;
+}
+
+.MuiTimelineItem-root::before{
+  display: none;
+}
+
+.timeline-connector{
+  background: none !important;
+  border-left: 2px solid #bdbdbd !important;
+  border-left-style: dashed !important;
+}
+
+/* .slider-news-container .slick-track {
+  transition: transform 5000ms linear !important;
+}
+
+.slider-news-container .slick-slide {
+  transition: opacity 300ms ease;
+} */
+
+/* mobile cards */
+@media screen and (max-width : 639px) {
+  .mobile-view-cards {
+    width: 350px;
+  }
+}
+
+@media screen and (max-width : 370px) {
+  .mobile-view-cards {
+    width: auto;
+  }
+}
+
+.mapWrapper .row:last-child {
+  display: flex;
+  justify-content: flex-end;
+}
+
