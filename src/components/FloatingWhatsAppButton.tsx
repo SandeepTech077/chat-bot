@@ -9,7 +9,7 @@ const FloatingWhatsAppButton = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50" onClick={handleClick}>
+    <div className="fixed bottom-[8rem] right-4 sm:right-6 z-50" onClick={handleClick}>
      
         <img loading="lazy" src={Icons.whatsapp} alt="" className="cursor-pointer" />
 

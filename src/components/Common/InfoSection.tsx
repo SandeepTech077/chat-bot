@@ -1,15 +1,28 @@
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import AnimateOnInView from "../../animation/AnimateOnInView";
 import CustomButton from "../Common/CustomButton";
-import Titlep from "./Titlep";
 
-const fadeInVariants = {
-  hidden: { opacity: 0 },
+// Shared animation config
+const EASE = [0.22, 1, 0.36, 1]; // custom spring ease
+
+const fadeUp = (delay = 0) => ({
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease: EASE, delay } },
+});
+
+const imgReveal = {
+  hidden: { clipPath: "inset(0 100% 0 0)", opacity: 0 },
   visible: {
+    clipPath: "inset(0 0% 0 0)",
     opacity: 1,
-    transition: { duration: 1, ease: "easeOut" },
+    transition: { duration: 1, ease: EASE },
   },
+};
+
+const lineGrow = {
+  hidden: { scaleX: 0 },
+  visible: { scaleX: 1, transition: { duration: 0.9, ease: EASE, delay: 0.3 } },
 };
 
 interface SectionComponentProps {
@@ -17,7 +30,7 @@ interface SectionComponentProps {
   title: string;
   subtitle: string;
   description: string;
-  description2?: string;
+  description2?: React.ReactNode;
   description3?: string;
   buttonText?: string;
   buttonLink?: string;
@@ -44,134 +57,169 @@ const InfoSection: React.FC<SectionComponentProps> = ({
   isvisible,
 }) => {
   const navigate = useNavigate();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.15 });
+
+  const showButton = buttonText && buttonLink && (is_button !== "true" || home);
 
   return (
-    <section className="w-full sm:px-0 mt-10">
-      {/* Mobile View */}
-      <div className="sm:hidden flex flex-col items-center">
-        <div className="w-full text-center">
-          <AnimateOnInView variants={fadeInVariants}>
-            <Titlep className="text-sm md:text-xl" text={title} />
-          </AnimateOnInView>
+    <section ref={ref} className="w-full mt-10 sm:mt-16 lg:mt-20">
+      {/* ── MOBILE ── */}
+      <div className="sm:hidden flex flex-col gap-6">
+        <div>
+          {/* Label */}
+          <motion.div
+            variants={fadeUp(0)}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="flex items-center gap-3 mb-3"
+          >
+            <motion.span
+              variants={lineGrow}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              className="inline-block h-[2px] w-8 bg-black origin-left"
+            />
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-customGrey">
+              {title}
+            </span>
+          </motion.div>
 
-          <AnimateOnInView variants={fadeInVariants}>
-            <h1 className="text-2xl capitalize block text-left">{subtitle}</h1>
-          </AnimateOnInView>
+          {/* Headline */}
+          <motion.h1
+            variants={fadeUp(0.1)}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="text-2xl font-bold leading-tight capitalize"
+          >
+            {subtitle}
+          </motion.h1>
 
-          <AnimateOnInView variants={fadeInVariants}>
-            <p className="mt-4 text-base text-customGrey text-left">
-              {description}
-            </p>
-            {description2 && (
-              <p className="mt-4 text-base text-customGrey text-left">
-                {description2}
-              </p>
-            )}
-            {description3 && (
-              <p className="mt-4 text-base text-customGrey text-left">
-                {description3}
-              </p>
-            )}
-          </AnimateOnInView>
+          {/* Body text */}
+          <motion.div
+            variants={fadeUp(0.2)}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="mt-4 space-y-3 text-sm text-customGrey leading-relaxed"
+          >
+            <p>{description}</p>
+            {description2 && <p>{description2}</p>}
+            {description3 && <p>{description3}</p>}
+          </motion.div>
         </div>
 
-        {/* Mobile Image */}
+        {/* Image */}
         {isvisible !== "true" && imageSrc && (
-          <AnimateOnInView
-            className="w-full flex justify-center mt-4"
-            variants={fadeInVariants}
+          <motion.div
+            variants={imgReveal}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="w-full overflow-hidden rounded-sm"
           >
-            <motion.img
+            <img
               src={imageSrc}
               alt={title}
-              className={`w-full h-auto ${imgClass}`}
-              initial="hidden"
-              animate="visible"
-              variants={fadeInVariants}
+              className={`w-full h-[260px] object-cover ${imgClass}`}
             />
-          </AnimateOnInView>
+          </motion.div>
         )}
 
-        {/* Mobile Button */}
+        {/* Button */}
         {buttonText && buttonLink && is_button === "true" && (
-          <AnimateOnInView variants={fadeInVariants}>
-            <div className="mt-6">
-              <CustomButton
-                text={buttonText}
-                onClick={() => navigate(buttonLink)}
-              />
-            </div>
-          </AnimateOnInView>
+          <motion.div
+            variants={fadeUp(0.3)}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+          >
+            <CustomButton text={buttonText} onClick={() => navigate(buttonLink)} />
+          </motion.div>
         )}
       </div>
 
-      {/* Web View */}
-      <div className="hidden sm:block lg:flex w-full">
-        <div
-          className={`flex flex-col lg:flex-row items-center w-full ${
-            reverse ? "lg:flex-row-reverse" : ""
-          }`}
-        >
-          {/* Image */}
-          {imageSrc && (
-            <AnimateOnInView
-              className="w-full sm:w-1/2 flex justify-center order-first lg:order-1 mt-4"
-              variants={fadeInVariants}
+      {/* ── DESKTOP ── */}
+      <div
+        className={`hidden sm:flex items-center gap-10 lg:gap-16 w-full ${
+          reverse ? "flex-row-reverse" : "flex-row"
+        }`}
+      >
+        {/* Image side */}
+        {imageSrc && (
+          <motion.div
+            variants={imgReveal}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="w-1/2 shrink-0 overflow-hidden rounded-sm"
+          >
+            <img
+              src={imageSrc}
+              alt={title}
+              className={`w-full object-cover ${imgClass}`}
+              style={{ height: "clamp(320px, 55vh, 580px)" }}
+            />
+          </motion.div>
+        )}
+
+        {/* Text side */}
+        <div className="flex-1 flex flex-col gap-5">
+          {/* Label + line */}
+          <motion.div
+            variants={fadeUp(0)}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="flex items-center gap-3"
+          >
+            <motion.span
+              variants={lineGrow}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              className="inline-block h-[2px] w-8 bg-black origin-left"
+            />
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-customGrey">
+              {title}
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            variants={fadeUp(0.1)}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.15] capitalize"
+          >
+            {subtitle}
+          </motion.h1>
+
+          {/* Separator */}
+          <motion.div
+            variants={lineGrow}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="h-px w-full bg-[#EDEAEA] origin-left"
+          />
+
+          {/* Body text */}
+          <motion.div
+            variants={fadeUp(0.2)}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="space-y-3 text-sm md:text-base text-customGrey leading-relaxed"
+          >
+            <p>{description}</p>
+            {description2 && <p>{description2}</p>}
+            {description3 && <p>{description3}</p>}
+          </motion.div>
+
+          {/* Button */}
+          {showButton && (
+            <motion.div
+              variants={fadeUp(0.3)}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              className="mt-2"
             >
-              <motion.img
-                src={imageSrc}
-                alt={title}
-                className={`lg:w-[80%] lg:h-[60vh] ${imgClass} sm:max-h-none`}
-                initial="hidden"
-                animate="visible"
-                variants={fadeInVariants}
-              />
-            </AnimateOnInView>
+              <CustomButton text={buttonText!} onClick={() => navigate(buttonLink!)} />
+            </motion.div>
           )}
-
-          {/* Text and Button */}
-          <div className="w-full sm:w-1/2 text-center sm:text-left order-2 lg:order-2">
-            <AnimateOnInView variants={fadeInVariants}>
-              <Titlep
-                className="mb-6 sm:mb-6 text-base sm:text-sm md:text-xl"
-                text={title}
-              />
-            </AnimateOnInView>
-
-            <AnimateOnInView variants={fadeInVariants}>
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl capitalize block text-left">
-                {subtitle}
-              </h1>
-            </AnimateOnInView>
-
-            <AnimateOnInView variants={fadeInVariants}>
-              <p className="mt-4 text-sm sm:text-base md:text-sm text-customGrey text-left">
-                {description}
-              </p>
-              {description2 && (
-                <p className="mt-4 text-sm sm:text-base md:text-sm text-customGrey text-left">
-                  {description2}
-                </p>
-              )}
-              {description3 && (
-                <p className="mt-4 text-sm sm:text-base md:text-sm text-customGrey text-left">
-                  {description3}
-                </p>
-              )}
-            </AnimateOnInView>
-
-            {/* Web Button */}
-            {buttonText && buttonLink && (is_button !== "true" || home) && (
-              <AnimateOnInView variants={fadeInVariants}>
-                <div className="flex justify-center sm:justify-start mt-6 sm:mt-10">
-                  <CustomButton
-                    text={buttonText}
-                    onClick={() => navigate(buttonLink)}
-                  />
-                </div>
-              </AnimateOnInView>
-            )}
-          </div>
         </div>
       </div>
     </section>

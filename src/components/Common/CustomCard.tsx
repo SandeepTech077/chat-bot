@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { MdInfoOutline } from "react-icons/md";
 import { BsDownload } from "react-icons/bs";
-import Images from "../../assets/Images";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { ProjectDataTypes } from "../../types/projectDataTypes.types";
 import EnquiryModal from "../Modals/EnquiryModal";
-import AnimateOnInView from "../../animation/AnimateOnInView"; // Import the animation component
 import { commerical, plots, residential } from "../../constants/projectTypes";
 import Icons from "../../assets/Icons";
 
@@ -50,18 +49,6 @@ const CustomCard = ({
 
   const handleNavigate = () => {
     navigate(`/projects/${data.parent_category}/${data.url}`);
-  };
-
-  const cardVariants = {
-    hidden: (direction: string) => ({
-      opacity: 0,
-      y: direction === "up" ? -100 : 100,
-    }),
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeInOut" },
-    },
   };
 
   function getProjectType() {
@@ -137,75 +124,85 @@ const CustomCard = ({
 
   return (
     <>
-      <AnimateOnInView variants={cardVariants} custom={reverse ? "down" : "up"}>
+      <motion.div
+        initial={{ opacity: 0, y: reverse ? 40 : -40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        whileHover={{ y: -6, transition: { duration: 0.3, ease: "easeOut" } }}
+        className="bg-white z-10 max-w-sm md:max-w-md relative group cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-500"
+        onClick={handleNavigate}
+      >
+        {/* Project type badge */}
+        {getProjectType() && (
+          <span className="absolute top-3 right-3 z-20 bg-black text-white text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-sm font-medium">
+            {getProjectType()}
+          </span>
+        )}
+
         <div
-          className="bg-white z-10 max-w-sm md:max-w-md relative group cursor-pointer"
-          onClick={handleNavigate}
+          className={`absolute ${
+            reverse ? "lg:bottom-10 max-lg:top-2" : "top-2"
+          } left-2 flex flex-col space-y-2 p-2 z-20`}
         >
-          <div
-            className={`absolute ${
-              reverse ? "lg:bottom-10 max-lg:top-2" : "top-2"
-            } left-2 flex flex-col space-y-3 p-2 z-20`}
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="p-2 bg-black rounded-full flex items-center justify-center"
+            onClick={handleInquiryClick}
           >
-            <div
-              className="p-2 bg-black rounded-full flex items-center justify-center relative"
-              onClick={handleInquiryClick}
-            >
-              <MdInfoOutline className="text-white text-xl cursor-pointer" />
-            </div>
-            {data?.title === "Up Coming Shilp Residential" ||
-            data?.title === "Shilp Iskon Ambli" ? (
-              ""
-            ) : (
-              <div
+            <MdInfoOutline className="text-white text-xl cursor-pointer" />
+          </motion.div>
+          {data?.title !== "Up Coming Shilp Residential" &&
+            data?.title !== "Shilp Iskon Ambli" && (
+              <motion.div
+                whileHover={{ scale: 1.1 }}
                 className="p-2 bg-black rounded-full flex items-center justify-center"
                 onClick={handleDownloadClick}
               >
                 <BsDownload className="text-white text-xl cursor-pointer" />
-              </div>
+              </motion.div>
             )}
-          </div>
-
-          {/* Mobile view */}
-          <div className="lg:hidden mobile-view-cards">
-            <div className="overflow-hidden rounded-t-lg">
-              <img
-                src={data?.card_img || `https://picsum.photos/200/300`}
-                alt={data?.alt || "image"}
-                className="h-[300px] w-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-              />
-            </div>
-            <CardContent />
-          </div>
-
-          {/* Desktop view */}
-          <div className="hidden lg:block">
-            {reverse ? (
-              <>
-                <CardContent />
-                <div className="overflow-hidden rounded-b-lg">
-                  <img
-                    src={data?.card_img || `https://picsum.photos/200/300`}
-                    alt={data?.alt || "image"}
-                    className="w-[500px] h-[300px] xl:h-[350px] 2xl:h-[450px] object-cover object-center transition-transform duration-300 ease-in group-hover:scale-[1.1]"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="overflow-hidden rounded-t-lg">
-                  <img
-                    src={data?.card_img || `https://picsum.photos/200/300`}
-                    alt={data?.alt || "image"}
-                    className="w-[500px] h-[300px] xl:h-[350px] 2xl:h-[450px] object-cover object-center transition-transform duration-300 ease-in group-hover:scale-[1.1]"
-                  />
-                </div>
-                <CardContent />
-              </>
-            )}
-          </div>
         </div>
-      </AnimateOnInView>
+
+        {/* Mobile view */}
+        <div className="lg:hidden mobile-view-cards">
+          <div className="overflow-hidden rounded-t-sm">
+            <img
+              src={data?.card_img || `https://picsum.photos/200/300`}
+              alt={data?.alt || "image"}
+              className="h-[300px] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+            />
+          </div>
+          <CardContent />
+        </div>
+
+        {/* Desktop view */}
+        <div className="hidden lg:block">
+          {reverse ? (
+            <>
+              <CardContent />
+              <div className="overflow-hidden rounded-b-sm">
+                <img
+                  src={data?.card_img || `https://picsum.photos/200/300`}
+                  alt={data?.alt || "image"}
+                  className="w-[500px] h-[300px] xl:h-[350px] 2xl:h-[450px] object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="overflow-hidden rounded-t-sm">
+                <img
+                  src={data?.card_img || `https://picsum.photos/200/300`}
+                  alt={data?.alt || "image"}
+                  className="w-[500px] h-[300px] xl:h-[350px] 2xl:h-[450px] object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+                />
+              </div>
+              <CardContent />
+            </>
+          )}
+        </div>
+      </motion.div>
 
       {isModalOpen && (
         <EnquiryModal

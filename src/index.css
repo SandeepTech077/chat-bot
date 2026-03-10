@@ -17,8 +17,16 @@ body {
     @apply container mx-auto px-4
   }
   /* equal top spacing */
-  .top-spacing{
-   @apply mt-10 md:mt-20
+  .top-spacing {
+    @apply mt-10 md:mt-20
+  }
+  /* hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
 }

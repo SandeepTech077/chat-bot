@@ -1,73 +1,59 @@
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import Images from "../assets/Images";
 import OurTeamSection from "../components/About/OurTeamSection";
-import AnimateOnInView from "../animation/AnimateOnInView";
-import TitleTwo from "../components/Common/TitleTwo";
 import BannerImg from "../components/BannerImg";
-import mobileteam from "../assets/Images/mobile/shilp-group-building-front-view.webp"
+import mobileteam from "../assets/Images/mobile/shilp-group-building-front-view.webp";
 
-const textVariants = {
-  hidden: { x: -100, opacity: 0 },
-  visible: {
-    x: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.8,
-      ease: "easeOut",
-      delay: 0.2,
-    },
-  },
-};
-
-const imageVariants = {
-  hidden: { scale: 0.8, opacity: 0 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    transition: {
-      duration: 0.8,
-      ease: "easeOut",
-      delay: 0.5,
-    },
-  },
-};
+const EASE = [0.22, 1, 0.36, 1];
 
 const OurTeam = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.2 });
+
   return (
     <>
-       <BannerImg image={`${Images.ourTeamBanner}`} className="sm:block hidden" />
-       <BannerImg image={`${mobileteam}`} className="sm:hidden block" />
-      <section className="container-base mb-10 px-10">
+      <BannerImg image={Images.ourTeamBanner} className="sm:block hidden" />
+      <BannerImg image={mobileteam} className="sm:hidden block" />
+      <section className="container-base">
         <OurTeamSection
           heading="Meet Our Team"
-          // title="Meet Our Team"
-          // subtitle="Our team is committed to delivering exceptional service and innovative solutions."
+          title=""
+          subtitle=""
           isViewbtnVisible={false}
         />
 
-        <div className="container-base mx-auto mt-10">
-          {/* Text Section with Animation */}
-          <AnimateOnInView
-            variants={textVariants}
-            className="mb-6 sm:mb-8 md:mb-10"
+        {/* Team photo */}
+        <div ref={ref} className="top-spacing">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, ease: EASE }}
+            className="flex items-center gap-3 mb-6"
           >
-            <TitleTwo text="Team Shilp" className="mb-10 " />
-            <span className="capitalize text-center text-2xl sm:text-3xl md:text-4xl  block mb-4 sm:mb-6">
-               
+            <motion.span
+              initial={{ scaleX: 0 }}
+              animate={inView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+              className="inline-block h-[2px] w-8 bg-black origin-left"
+            />
+            <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-customGrey">
+              Team Shilp
             </span>
-          </AnimateOnInView>
-
-          {/* Image Section with Animation */}
-          <AnimateOnInView
-            variants={imageVariants}
-            className="mt-6 sm:mt-8 md:mt-10"
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.9, ease: EASE, delay: 0.2 }}
+            className="overflow-hidden"
           >
             <img
               src={Images.AboutTeam}
               alt="Shilp Group Team Members."
               loading="lazy"
-              className="w-full h-auto object-cover rounded-md"
+              className="w-full h-auto object-cover"
             />
-          </AnimateOnInView>
+          </motion.div>
         </div>
       </section>
     </>

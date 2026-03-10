@@ -1,7 +1,7 @@
 import { blogData } from "../assets/data/blogData";
 import BlogBanner from "../components/Blogs/BlogBanner";
 import BlogCard from "../components/Common/BlogCard";
-import BannerImage from "../assets/blogs/BlogsBanner/Banner.png"
+import BannerImage from "../assets/blogs/BlogsBanner/banner.png"
 import MobileBanner from "../assets/blogs/BlogsBanner/mobile-banner.png"
 
 const Blog = () => {

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import IconWithTitle from "./IconWithTitle";
 import location from "../../assets/Icons/location.svg";
 import mail from "../../assets/Icons/Mail.svg";
@@ -8,7 +9,6 @@ import EnquiryModal from "../Modals/EnquiryModal";
 import IconWithTitleMobile from "./IconWithTitleMobile";
 import { useParams } from "react-router-dom";
 import { getCategoryType } from "../../utils/getCategoryType";
-import AnimateOnInView from "../../animation/AnimateOnInView";
 import status10 from "../../assets/Images/Progress bar/1.svg";
 import status20 from "../../assets/Images/Progress bar/2.svg";
 import status30 from "../../assets/Images/Progress bar/3.svg";
@@ -19,6 +19,8 @@ import status70 from "../../assets/Images/Progress bar/7.svg";
 import status80 from "../../assets/Images/Progress bar/8.svg";
 import status90 from "../../assets/Images/Progress bar/9.svg";
 import status100 from "../../assets/Images/Progress bar/10.svg";
+
+const EASE = [0.22, 1, 0.36, 1];
 
 interface ProjectTitleProps {
   title: string;
@@ -37,13 +39,15 @@ const ProjectTitleArea = ({
   isCompleted,
   comp_status,
 }: ProjectTitleProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.1 });
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalPdf, setModalPdf] = useState<string | undefined>(undefined);
-  const [showTooltip, setShowTooltip] = useState<boolean>(false); // To control tooltip visibility
+  const [showTooltip, setShowTooltip] = useState<boolean>(false);
 
   const { category } = useParams();
 
-  // Handlers to open modal for different actions
   const handleInquiryClick = () => {
     setModalPdf(undefined);
     setIsModalOpen(true);
@@ -58,7 +62,6 @@ const ProjectTitleArea = ({
     setIsModalOpen(false);
   };
 
-  // Function to map project status to appropriate SVG
   const getStatusIcon = (status: number) => {
     if (status <= 10) return status10;
     if (status <= 20) return status20;
@@ -69,95 +72,87 @@ const ProjectTitleArea = ({
     if (status <= 70) return status70;
     if (status <= 80) return status80;
     if (status <= 90) return status90;
-    return status100; // for 100%
+    return status100;
   };
 
-  const variants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 3, delay: 1 } },
-  };
-
-  const status = comp_status ? parseInt(comp_status, 10) : 50; // Default to 50% if comp_status is undefined
+  const status = comp_status ? parseInt(comp_status, 10) : 50;
 
   return (
-    <AnimateOnInView variants={variants}>
-      <section>
-        <div className="container-base relative bottom-[7rem]">
-          {/* Large screen layout (lg and above) */}
-          <div className="hidden lg:flex items-center justify-between p-5 bg-white rounded-t-xl">
-            {/* Left section */}
-            <div className="flex flex-col">
-              <h1 className="font-semibold pb-3 text-3xl">{title}</h1>
-              <div className="flex xl:gap-3 gap-2 ">
-                <span>{getCategoryType(category)}</span>
-                <span>|</span>
-                <span>{address_title || "Ahmedabad"}</span>
-                <span>|</span>
-                <span>
-                  {isCompleted ? "Completed Project " : "Ongoing Project"}
-                </span>
-              </div>
-            </div>
-
-            {/* Right section with icons */}
-            <div className="flex gap-10">
-              <IconWithTitle
-                icon={mail}
-                title="Inquiry"
-                onClick={handleInquiryClick}
-              />
-              <IconWithTitle
-                icon={download}
-                title="Download"
-                onClick={handleDownloadClick}
-              />
-              <IconWithTitle href="#gallery" icon={gallery} title="Gallery" />
-              <IconWithTitle
-                href="#location"
-                icon={location}
-                title="Location"
-              />
-
-              {/* Project Status icon with dynamic status */}
-              <div
-                className="relative"
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
+    <section ref={ref}>
+      <div className="container-base relative bottom-[7rem]">
+        {/* Desktop bar (lg+) */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: EASE }}
+          className="hidden lg:flex items-center justify-between px-8 py-5 bg-white border-t-4 border-t-black shadow-lg rounded-t-xl"
+        >
+          {/* Left: title + meta */}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl xl:text-3xl font-bold tracking-tight">{title}</h1>
+            <div className="flex items-center gap-2 text-sm text-customGrey">
+              <span className="font-medium">{getCategoryType(category)}</span>
+              <span className="text-lineGrey">|</span>
+              <span>{address_title || "Ahmedabad"}</span>
+              <span className="text-lineGrey">|</span>
+              <span
+                className={`inline-flex items-center gap-1 font-medium ${
+                  isCompleted ? "text-green-600" : "text-black"
+                }`}
               >
-                <IconWithTitle
-                  icon={getStatusIcon(status)}
-                  title="Project Status"
+                <span
+                  className={`inline-block w-2 h-2 rounded-full ${
+                    isCompleted ? "bg-green-500" : "bg-amber-400"
+                  }`}
                 />
-                {showTooltip && (
-                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-sm px-3 py-1 rounded-md shadow-lg whitespace-nowrap">
-                    Project Progress: {status}%
-                  </div>
-                )}
-              </div>
+                {isCompleted ? "Completed" : "Ongoing"}
+              </span>
             </div>
           </div>
 
-          {/* Small and medium screen layout (sm and md) */}
-          <IconWithTitleMobile
-            comp_status={comp_status}
-            handleInquiryClick={handleInquiryClick}
-            handleDownloadClick={handleDownloadClick}
-          />
-        </div>
+          {/* Right: action icons */}
+          <div className="flex items-center gap-8">
+            <IconWithTitle icon={mail} title="Inquiry" onClick={handleInquiryClick} />
+            <IconWithTitle icon={download} title="Download" onClick={handleDownloadClick} />
+            <IconWithTitle href="#gallery" icon={gallery} title="Gallery" />
+            <IconWithTitle href="#location" icon={location} title="Location" />
 
-        {/* Modal with conditional PDF prop */}
-        {isModalOpen && (
-          <EnquiryModal
-            projectName={title}
-            pdf={modalPdf}
-            sideImg={bannerImg[0]}
-            isModalOpen={isModalOpen}
-            closeModal={closeModal}
-          />
-        )}
-      </section>
-    </AnimateOnInView>
+            {/* Status with tooltip */}
+            <div
+              className="relative"
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            >
+              <IconWithTitle icon={getStatusIcon(status)} title="Project Status" />
+              {showTooltip && (
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-1.5 rounded shadow-xl whitespace-nowrap font-medium">
+                  Progress: {status}%
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Mobile / tablet layout */}
+        <IconWithTitleMobile
+          comp_status={comp_status}
+          handleInquiryClick={handleInquiryClick}
+          handleDownloadClick={handleDownloadClick}
+        />
+      </div>
+
+      {isModalOpen && (
+        <EnquiryModal
+          projectName={title}
+          pdf={modalPdf}
+          sideImg={bannerImg[0]}
+          isModalOpen={isModalOpen}
+          closeModal={closeModal}
+        />
+      )}
+    </section>
   );
 };
 
 export default ProjectTitleArea;
+

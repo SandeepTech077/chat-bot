@@ -1,149 +1,171 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Slider from "react-slick";
-import { BsArrowUpRightCircleFill } from "react-icons/bs";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { GoArrowUpRight } from "react-icons/go";
 import { projectData } from "../../assets/data/projectData";
 import { useNavigate } from "react-router-dom";
-import AnimateOnInView from "../../animation/AnimateOnInView";
-import Titlep from "../Common/Titlep";
+
+const EASE = [0.22, 1, 0.36, 1];
 
 const ExpandableGallery = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.15 });
 
-  const handleClick = (index: number) => {
-    setActiveIndex(index === activeIndex ? null : index);
-  };
-
-  const handleCategory = (category: string) => {
-    navigate(`/projects/${category}`);
-  };
-
-  const titleVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 1, delay: 0.5 } },
-  };
-
-  const tileVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  };
-
-  // Slider settings for autoplay
   const sliderSettings = {
     dots: false,
     arrows: false,
     infinite: true,
-    speed: 500,
+    speed: 600,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 2000,
+    autoplaySpeed: 2500,
+    fade: true,
   };
 
   useEffect(() => {
     if (activeIndex !== null) {
-      // Show loader for 2 seconds when an item is clicked
       setIsLoading(true);
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => setIsLoading(false), 800);
+      return () => clearTimeout(t);
     }
   }, [activeIndex]);
 
   return (
-    <section className="top-spacing ">
-      {/* Title sliding in from the left with a delay */}
-      <AnimateOnInView
-        variants={titleVariants}
-        transition={{ duration: 1, delay: 0.5 }}
-        className="lg:px-20 sm:px-0"
-      >
-        <Titlep text="Our Services" className="w-full" />
-        <h2 className="capitalize sm:text-3xl text-2xl ">
-          Best solutions in Residential, Commercial, and Plotting segments
-        </h2>
-      </AnimateOnInView>
+    <section className="top-spacing" ref={ref}>
+      {/* Heading */}
+      <div className="lg:px-20 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, ease: EASE }}
+          className="flex items-center gap-3 mb-3"
+        >
+          <motion.span
+            initial={{ scaleX: 0 }}
+            animate={inView ? { scaleX: 1 } : {}}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}
+            className="inline-block h-[2px] w-8 bg-black origin-left"
+          />
+          <span className="text-xs font-semibold tracking-[0.2em] uppercase text-customGrey">
+            Our Services
+          </span>
+        </motion.div>
 
-      <div className="flex flex-col md:flex-row items-center justify-center space-x-0 md:space-x-4 my-5 lg:mx-20">
-        {projectData.map((item, index) => (
-          <AnimateOnInView
-            key={item.id}
-            className={`relative w-full h-[200px] md:w-40 mt-5 rounded overflow-hidden cursor-pointer transition-all duration-500 ${
-              activeIndex === index
-                ? "md:w-full  sm:h-[350px] lg:h-[550px]"
-                : " lg:h-[550px] h-[50px]"
-            }`}
-            onClick={() => handleClick(index)}
-            variants={tileVariants}
-            transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
-          >
-            {activeIndex === index ? (
-              isLoading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
-                  <div className="w-full h-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse"></div>
-                </div>
-              ) : (
-                // Render Slider after loader
-                <Slider key={activeIndex} {...sliderSettings}>
-                  {item.explandable_back_img.map(
-                    (image: string, idx: number) => (
+        <motion.h2
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
+          className="text-2xl md:text-3xl lg:text-4xl font-bold capitalize"
+        >
+          Residential, Commercial &amp; Plotting
+        </motion.h2>
+      </div>
+
+      {/* Panels */}
+      <div className="flex flex-col md:flex-row gap-1 h-auto md:h-[560px] lg:mx-20">
+        {projectData.map((item, index) => {
+          const isActive = activeIndex === index;
+          return (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 40 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.75, ease: EASE, delay: 0.1 + index * 0.12 }}
+              className={`relative overflow-hidden cursor-pointer rounded-sm
+                transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]
+                ${isActive
+                  ? "md:flex-[3] h-[340px] md:h-full"
+                  : "md:flex-[0.5] h-[56px] md:h-full"
+                }`}
+              onClick={() => setActiveIndex(isActive ? null : index)}
+            >
+              {/* Background image */}
+              {isActive && !isLoading ? (
+                <Slider key={index} {...sliderSettings}>
+                  {item.explandable_back_img.map((img: string, i: number) => (
+                    <div key={i} className="w-full h-full">
                       <img
-                        key={idx}
-                        src={image}
-                        alt={`${item.title} ${idx + 1}`}
+                        src={img}
+                        alt={`${item.title} ${i}`}
+                        className="w-full h-[340px] md:h-[560px] object-cover"
                         loading="lazy"
-                        className="object-cover object-center w-full h-full transition-opacity duration-500"
                       />
-                    )
-                  )}
+                    </div>
+                  ))}
                 </Slider>
-              )
-            ) : (
-              // Display first image as background for inactive items
-              <img
-                src={item.explandable_back_img[0]}
-                alt={item.title}
-                loading="lazy"
-                className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
-                  activeIndex === index ? "opacity-70" : "opacity-40"
-                }`}
-              />
-            )}
+              ) : (
+                <img
+                  src={item.explandable_back_img[0]}
+                  alt={item.title}
+                  loading="lazy"
+                  className={`w-full h-full object-cover transition-all duration-700 ${
+                    isActive ? "scale-105" : "scale-100"
+                  }`}
+                />
+              )}
 
-            <div
-              className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-                activeIndex === index ? "opacity-0" : "opacity-70"
-              }`}
-            />
+              {/* Shimmer loader */}
+              <AnimatePresence>
+                {isActive && isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 animate-pulse"
+                  />
+                )}
+              </AnimatePresence>
 
-            {activeIndex === index && (
+              {/* Gradient overlay */}
               <div
-                className="absolute bottom-0 flex items-center justify-between w-full bg-black bg-opacity-70 px-4 py-2 rounded-lg"
-                onClick={() => handleCategory(item.category)}
-              >
-                <h3 className="text-white text-lg sm:text-xl sm:p-3">
-                  {item.title}
-                </h3>
-                <BsArrowUpRightCircleFill className="sm:text-4xl text-2xl inline-block transition-transform duration-300 transform hover:translate-x-1 text-white" />
-              </div>
-            )}
+                className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent
+                  transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-90"}`}
+              />
+              {/* Dark tint for inactive */}
+              {!isActive && <div className="absolute inset-0 bg-black/60" />}
 
-            {activeIndex !== index && (
-              <span
-                className={`absolute text-white text-lg sm:text-xl transition-transform duration-500 ${
-                  activeIndex === index
-                    ? "bottom-4 left-4 transform rotate-0"
-                    : "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate:0 md:-rotate-90"
-                }`}
-              >
-                {item.title}
-              </span>
-            )}
-          </AnimateOnInView>
-        ))}
+              {/* Title — Inactive: rotated on desktop, horizontal on mobile */}
+              {!isActive && (
+                <span className="absolute inset-0 flex items-center justify-center text-white font-semibold text-sm md:text-base tracking-widest uppercase
+                  md:-rotate-90 whitespace-nowrap select-none">
+                  {item.title}
+                </span>
+              )}
+
+              {/* Active bottom bar */}
+              <AnimatePresence>
+                {isActive && (
+                  <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 30, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: EASE }}
+                    className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-5 py-4 bg-black/60 backdrop-blur-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/projects/${item.category}`);
+                    }}
+                  >
+                    <div>
+                      <h3 className="text-white font-bold text-lg md:text-xl">{item.title}</h3>
+                      <p className="text-white/60 text-xs tracking-widest uppercase mt-0.5">
+                        Explore projects
+                      </p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center
+                      hover:bg-white hover:text-black transition-all duration-300 group">
+                      <GoArrowUpRight className="text-white group-hover:text-black text-lg transition-colors" />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

@@ -1,168 +1,201 @@
-import React, { useState, useEffect } from "react";
-import { FiX, FiChevronUp, FiChevronDown } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { FiX, FiChevronDown } from "react-icons/fi";
+import { Link, useLocation } from "react-router-dom";
 import { RiMenu3Line } from "react-icons/ri";
 import { FaWpforms } from "react-icons/fa";
+import { SlLocationPin } from "react-icons/sl";
+import { motion, AnimatePresence } from "framer-motion";
 import Images from "../assets/Images";
 import Icons from "../assets/Icons";
 import EnquiryModal from "./Modals/EnquiryModal";
 import { getCategoryData } from "../utils/helper";
 import { commerical, plots, residential } from "../constants/projectTypes";
-import { SlLocationPin } from "react-icons/sl";
 
-// Types
+// ─── Types ────────────────────────────────────────────────────────────────────
 interface NavLink {
   label: string;
   href: string;
 }
 
-interface DropdownProps {
-  items: Array<{
-    id: string;
-    title: string;
-    url: string;
-    size: string;
-    parent_category: string;
-    address: {
-      mini_address: {
-        line1: string;
-        line2?: string;
-        city?: string;
-        state?: string;
-        zip?: string;
-      };
+interface DropdownItem {
+  id: string;
+  title: string;
+  url: string;
+  size: string;
+  parent_category: string;
+  address: {
+    mini_address: {
+      line1: string;
+      line2?: string;
+      city?: string;
+      state?: string;
+      zip?: string;
     };
-  }>;
-  label: string;
+  };
+}
 
+interface DropdownProps {
+  items: DropdownItem[];
+  label: string;
   category: string;
 }
 
-// Internal Components
-const DesktopDropdown: React.FC<DropdownProps> = ({
-  items,
-  label,
-  category,
-}) => {
+// ─── Desktop Dropdown ─────────────────────────────────────────────────────────
+const DesktopDropdown: React.FC<DropdownProps> = ({ items, label, category }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const midPoint = Math.ceil(items.length / 2);
-
   const leftItems = items.slice(0, midPoint);
   const rightItems = items.slice(midPoint);
 
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   return (
-    <div className="relative ">
-      <div>
-        {/* Wrap only the label in a group div */}
-        <div className="group inline-flex relative">
-          <Link
-            to={`/projects/${category}`}
-            className="flex items-center text-sm hover:bg-black/30 hover:text-gray-300 xl:px-5 px-1 py-2  rounded transition-colors duration-300"
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <Link
+        to={`/projects/${category}`}
+        className="group flex items-center gap-1 text-[13px] xl:text-sm font-medium tracking-wide py-2 px-3"
+      >
+        <span className="relative">
+          {label}
+          <span className="absolute -bottom-0.5 left-0 h-[1px] w-0 bg-white transition-all duration-300 group-hover:w-full" />
+        </span>
+        <FiChevronDown
+          size={13}
+          className={`text-white/60 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+        />
+      </Link>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.18 }}
+            className="absolute left-1/2 -translate-x-1/2 top-full mt-0 w-[560px] z-50"
           >
-            {label}
-            <FiChevronDown className="ml-1" />
-          </Link>
-
-          {/* Move the dropdown inside the group div */}
-          <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-[600px] bg-white/10 backdrop-blur-[30px] rounded-lg shadow-2xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 origin-top top-10 ">
-            <div className="absolute inset-0 bg-black/50 rounded-lg" />
-            <div className="relative grid grid-cols-2 gap-6 p-6">
-              {[leftItems, rightItems].map((columnItems, columnIndex) => (
-                <div key={columnIndex} className="space-y-3">
-                  {columnItems.map((item) => {
-                    // Log the item.title here
-
-                    return (
-                      <div key={item.id} className="group/item">
-                        <Link
-                          to={`/projects/${item.parent_category}/${item.url}`}
-                          className="px-4 py-2 text-white rounded-md transition-colors duration-200 flex flex-col"
-                        >
-                          <span className="text-base">{item.title}</span>
-                          <div className="w-full h-px bg-white/20 opacity-0 scale-x-0 transition-all duration-300 group-hover/item:opacity-100 group-hover/item:scale-x-100" />
-                          <span className="text-sm transition-colors duration-300 group-hover/item:text-white flex gap-2 items-center">
-                            <SlLocationPin /> {item?.address.mini_address.line1}{" "}
-                            {item?.size && `|  ${item.size}`}
-                          </span>
-                        </Link>
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-
-              <div className="absolute left-1/2 top-[24px] bottom-[24px] -translate-x-1/2 w-[2px] bg-white/20" />
+            <div className="bg-[#0d0d0d]/95 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl overflow-hidden">
+              <div className="h-[1px] bg-white/15" />
+              <div className="grid grid-cols-2 p-5 gap-2 relative">
+                <div className="absolute left-1/2 top-4 bottom-4 w-px bg-white/10" />
+                {[leftItems, rightItems].map((colItems, ci) => (
+                  <div key={ci} className="space-y-0.5">
+                    {colItems.map((item) => (
+                      <Link
+                        key={item.id}
+                        to={`/projects/${item.parent_category}/${item.url}`}
+                        className="group/item flex flex-col px-3 py-2.5 rounded-md hover:bg-white/5 transition-all duration-200"
+                        onClick={() => setOpen(false)}
+                      >
+                        <span className="text-[13px] font-medium text-white/90 group-hover/item:text-white transition-colors duration-200">
+                          {item.title}
+                        </span>
+                        <span className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
+                          <SlLocationPin className="shrink-0" />
+                          {item.address.mini_address.line1}
+                          {item.size && ` · ${item.size}`}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
+// ─── Mobile Dropdown ──────────────────────────────────────────────────────────
 const MobileDropdown: React.FC<{
   isOpen: boolean;
   label: string;
-  items: DropdownProps["items"];
-  category: string; // Add category prop
+  items: DropdownItem[];
+  category: string;
   onToggle: () => void;
   onClose: () => void;
 }> = ({ isOpen, label, items, category, onToggle, onClose }) => (
-  <div className="space-y-4">
-    <div className="flex justify-between items-center">
-      {/* Make the parent category label a clickable link */}
+  <div className="border-b border-white/10 pb-3">
+    <div className="flex justify-between items-center py-2.5">
       <Link
         to={`/projects/${category}`}
-        className="text-white font-medium"
-        onClick={onClose} // Close the menu on click
+        className="text-sm text-white/80 font-medium tracking-wide hover:text-white transition-colors"
+        onClick={onClose}
       >
         {label}
       </Link>
-      {/* Toggle button */}
-      <button onClick={onToggle} className="text-white lg:hidden">
-        {isOpen ? <FiChevronUp /> : <FiChevronDown />}
+      <button
+        onClick={onToggle}
+        className={`p-1 text-white/60 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+      >
+        <FiChevronDown size={14} />
       </button>
     </div>
 
-    {isOpen && (
-      <div className="ml-4 lg:hidden rounded mt-2 p-3 space-y-5 mb-2">
-        {items.map((item) => (
-          <Link
-            key={item.id}
-            to={`/projects/${item.parent_category}/${item.url}`}
-            className="block text-white"
-            onClick={onClose}
-          >
-            <div className="flex flex-col">
-              <span className="font-semibold text-[13px]">{item.title}</span>
-              <div className="flex items-center gap-2">
-                <SlLocationPin className="text-sm" />
-                <div className="text-[11px] text-gray-300">
-                  {item.address.mini_address.line1}{" "}
-                  {item?.size && `|  ${item.size}`}
-                </div>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    )}
-    <hr className="border-gray-300 lg:hidden" />
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.22 }}
+          className="overflow-hidden"
+        >
+          <div className="ml-3 space-y-3 pt-1 pb-2">
+            {items.map((item) => (
+              <Link
+                key={item.id}
+                to={`/projects/${item.parent_category}/${item.url}`}
+                className="group flex flex-col"
+                onClick={onClose}
+              >
+                <span className="text-[13px] text-white/80 group-hover:text-white transition-colors font-medium">
+                  {item.title}
+                </span>
+                <span className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
+                  <SlLocationPin />
+                  {item.address.mini_address.line1}
+                  {item.size && ` · ${item.size}`}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   </div>
 );
 
-// Main Navbar Component
+// ─── Main Navbar ──────────────────────────────────────────────────────────────
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCommercialOpen, setIsCommercialOpen] = useState(false);
   const [isResidentialOpen, setIsResidentialOpen] = useState(false);
   const [isPlotsOpen, setIsPlotsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const location = useLocation();
 
+  // Close mobile menu on route change
+  useEffect(() => { setIsMenuOpen(false); }, [location]);
+
+  // Prevent body scroll when menu is open
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    return () => { document.body.style.overflow = "unset"; };
   }, [isMenuOpen]);
 
   const navLinks: NavLink[] = [
@@ -184,180 +217,211 @@ const Navbar: React.FC = () => {
     plots: getCategoryData(plots),
   };
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleMenu = () => setIsMenuOpen((p) => !p);
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="fixed top-0 w-full z-20 transition-shadow duration-300 text-white">
-      {/* Background Overlay */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-none" />
-
-      {/* Main Navbar Content */}
-      <div className="container-base mx-auto px-4 py-4 flex items-center justify-between relative z-10 ">
-        {/* Logo */}
-        <Link to="/" className="z-20">
-          <img
-            src={Images.whiteLogo}
-            alt="logo"
-            loading="lazy"
-            className="xl:w-[120px] sm:w-[100px] w-[120px]"
-          />
-        </Link>
-
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-4 text-sm xl:text-base text-white z-20 ">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.href}
-              className="hover:bg-black/30 hover:text-gray-300 xl:px-5 px-2 py-2 rounded transition-colors duration-300 text-sm"
-            >
-              {link.label}
-            </Link>
-          ))}
-
-          <DesktopDropdown
-            label="Commercial"
-            items={dropdowns.commercial}
-            category={commerical}
-          />
-          <DesktopDropdown
-            label="Residential"
-            items={dropdowns.residential}
-            category={residential}
-          />
-          <DesktopDropdown
-            label="Plots"
-            items={dropdowns.plots}
-            category={plots}
-          />
-
-          <Link
-            to="http://snehshilp.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:bg-black/30 hover:text-gray-300 xl:px-5 px-1 py-2 rounded transition-colors duration-300 text-sm"
-          >
-            Sneh Shilp Foundation
-          </Link>
-        </div>
-
-        {/* Right Side Actions */}
-        <div className="flex items-center xl:space-x-4 space-x-5 z-20">
-          <button
-            className="hidden lg:block border rounded-full py-2 md:px-3 lg:px-5 text-sm hover:bg-black hover:border-black hover:text-white transition-colors duration-200"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Enquiry Now
-          </button>
-          <a href="tel:+917435811123">
-            <img loading="lazy" src={Icons.call} alt="call" className="z-20 " />
-          </a>
-          <FaWpforms
-            className="text-xl lg:hidden z-20 h-6 w-6 "
-            onClick={() => setIsModalOpen(true)}
-          />
-          <button onClick={toggleMenu} aria-label="Menu" className="z-20">
-            <RiMenu3Line size={30} />
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Sidebar */}
-      <div
-        className={`fixed bg-black top-0 right-0 h-full overflow-auto shadow-lg w-64 p-6 transform transition-transform duration-300 z-20 ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+    <>
+      <nav
+        className="fixed top-0 w-full z-50 text-white bg-black/70 backdrop-blur-md"
       >
-        <div className="flex justify-end">
-          <FiX
-            className="text-2xl cursor-pointer text-white"
-            onClick={closeMenu}
-          />
-        </div>
+        {/* Subtle top accent line */}
+        <div className="h-[1px] bg-white/10" />
 
-        <div className="space-y-4 mt-8">
-          {/* Mobile Navigation Links */}
-          {navLinks.map((link, index) => (
-            <React.Fragment key={index}>
-              {link.href.startsWith("http") ? (
+        <div className="container-base mx-auto px-4 xl:px-8 py-3.5 flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="shrink-0">
+            <img
+              src={Images.whiteLogo}
+              alt="Shilp Group"
+              loading="eager"
+              className="xl:w-[112px] w-[96px] object-contain"
+            />
+          </Link>
+
+          {/* Desktop Nav */}
+          <div className="hidden lg:flex items-center gap-0.5 text-white">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                to={link.href}
+                className="group relative text-[13px] xl:text-sm font-medium tracking-wide px-3 py-2"
+              >
+                <span className="relative">
+                  {link.label}
+                  <span className="absolute -bottom-0.5 left-0 h-[1px] w-0 bg-white transition-all duration-300 group-hover:w-full" />
+                </span>
+              </Link>
+            ))}
+
+            <DesktopDropdown label="Commercial" items={dropdowns.commercial} category={commerical} />
+            <DesktopDropdown label="Residential" items={dropdowns.residential} category={residential} />
+            <DesktopDropdown label="Plots" items={dropdowns.plots} category={plots} />
+
+            <Link
+              to="http://snehshilp.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative text-[13px] xl:text-sm font-medium tracking-wide px-3 py-2"
+            >
+              <span className="relative">
+                Sneh Shilp Foundation
+                <span className="absolute -bottom-0.5 left-0 h-[1px] w-0 bg-white transition-all duration-300 group-hover:w-full" />
+              </span>
+            </Link>
+          </div>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-4">
+            {/* Enquiry button - desktop */}
+            <button
+              className="hidden lg:inline-flex items-center text-[12px] font-semibold tracking-[0.12em] uppercase border border-white/70 text-white hover:bg-white hover:text-black px-5 py-2 rounded-sm transition-all duration-300"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Enquire Now
+            </button>
+
+            {/* Phone */}
+            <a
+              href="tel:+917435811123"
+              className="hover:opacity-70 transition-opacity"
+              aria-label="Call us"
+            >
+              <img loading="lazy" src={Icons.call} alt="call" className="w-5 h-5 object-contain" />
+            </a>
+
+            {/* Mobile enquiry icon */}
+            <FaWpforms
+              size={20}
+              className="text-white hover:text-gray-300 transition-colors cursor-pointer lg:hidden"
+              onClick={() => setIsModalOpen(true)}
+            />
+
+            {/* Hamburger */}
+            <button
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+              className="text-white hover:text-gray-300 transition-colors duration-200"
+            >
+              {isMenuOpen ? <FiX size={24} /> : <RiMenu3Line size={24} />}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* ── Mobile Sidebar ── */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            {/* Dark overlay */}
+            <motion.div
+              key="overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/65 backdrop-blur-sm z-40"
+              onClick={closeMenu}
+            />
+
+            {/* Sidebar drawer */}
+            <motion.aside
+              key="drawer"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.28 }}
+              className="fixed top-0 right-0 h-full w-[280px] bg-[#080808] border-l border-white/10 z-50 flex flex-col overflow-y-auto"
+            >
+              {/* Drawer header */}
+              <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+                <img src={Images.whiteLogo} alt="logo" className="w-[88px]" />
+                <button
+                  onClick={closeMenu}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  <FiX size={22} />
+                </button>
+              </div>
+
+              {/* Nav items */}
+              <div className="flex-1 px-6 py-5 space-y-0.5">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={closeMenu}
+                    className="block py-2.5 text-sm text-white/75 hover:text-white border-b border-white/10 font-medium tracking-wide transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
+                <MobileDropdown
+                  label="Commercial"
+                  items={dropdowns.commercial}
+                  category={commerical}
+                  isOpen={isCommercialOpen}
+                  onToggle={() => setIsCommercialOpen((p) => !p)}
+                  onClose={closeMenu}
+                />
+                <MobileDropdown
+                  label="Residential"
+                  items={dropdowns.residential}
+                  category={residential}
+                  isOpen={isResidentialOpen}
+                  onToggle={() => setIsResidentialOpen((p) => !p)}
+                  onClose={closeMenu}
+                />
+                <MobileDropdown
+                  label="Plots"
+                  items={dropdowns.plots}
+                  category={plots}
+                  isOpen={isPlotsOpen}
+                  onToggle={() => setIsPlotsOpen((p) => !p)}
+                  onClose={closeMenu}
+                />
+
+                {sidebarLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={closeMenu}
+                    className="block py-2.5 text-sm text-white/75 hover:text-white border-b border-white/10 font-medium tracking-wide transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
                 <a
-                  href={link.href}
+                  href="http://snehshilp.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={closeMenu}
-                  className="block text-white lg:hidden"
+                  className="block py-2.5 text-sm text-white/75 hover:text-white border-b border-white/10 font-medium tracking-wide transition-colors"
                 >
-                  {link.label}
+                  Sneh Shilp Foundation
                 </a>
-              ) : (
-                <Link
-                  to={link.href}
-                  onClick={closeMenu}
-                  className="block text-white lg:hidden"
+              </div>
+
+              {/* CTA at bottom */}
+              <div className="px-6 py-5 border-t border-white/10">
+                <button
+                  className="w-full py-3 text-sm font-semibold tracking-[0.12em] uppercase bg-white text-black hover:bg-gray-200 transition-colors rounded-sm"
+                  onClick={() => { setIsModalOpen(true); closeMenu(); }}
                 >
-                  {link.label}
-                </Link>
-              )}
-              <hr className="border-gray-300 lg:hidden" />
-            </React.Fragment>
-          ))}
-
-          <MobileDropdown
-            label="Commercial"
-            items={dropdowns.commercial}
-            category={commerical}
-            isOpen={isCommercialOpen}
-            onToggle={() => setIsCommercialOpen(!isCommercialOpen)}
-            onClose={closeMenu}
-          />
-          <MobileDropdown
-            label="Residential"
-            items={dropdowns.residential}
-            category={residential}
-            isOpen={isResidentialOpen}
-            onToggle={() => setIsResidentialOpen(!isResidentialOpen)}
-            onClose={closeMenu}
-          />
-          <MobileDropdown
-            label="Plots"
-            items={dropdowns.plots}
-            category={plots}
-            isOpen={isPlotsOpen}
-            onToggle={() => setIsPlotsOpen(!isPlotsOpen)}
-            onClose={closeMenu}
-          />
-
-          {/* Additional Sidebar Links */}
-          {sidebarLinks.map((link, index) => (
-            <React.Fragment key={index}>
-              <Link
-                to={link.href}
-                onClick={closeMenu}
-                className="block text-white"
-              >
-                {link.label}
-              </Link>
-              <hr className="border-gray-300" />
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
+                  Enquire Now
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Enquiry Modal */}
       <EnquiryModal
         isModalOpen={isModalOpen}
         closeModal={() => setIsModalOpen(false)}
       />
-
-      {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10"
-          onClick={closeMenu}
-        />
-      )}
-    </nav>
+    </>
   );
 };
 

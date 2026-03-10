@@ -3,7 +3,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import BannerImg from "../components/BannerImg";
 import Images from "../assets/Images";
-import TitleTwo from "../components/Common/TitleTwo";
+import { motion } from "framer-motion";
 import { Checkbox, TextField, Select, MenuItem, InputAdornment, IconButton, FormControl, InputLabel, FormHelperText } from "@mui/material";
 import CustomButton from "../components/Common/CustomButton";
 import { CareerValidationSchema } from "../validations/career.validation";
@@ -13,6 +13,8 @@ import axios from "axios";
 import { BASE_URL } from "../constants/projectTypes";
 import mobile_carr from "../assets/Images/mobile/mobile-career-banner.webp";
 import UploadIcon from "../assets/Icons/Vector.svg";
+
+const EASE = [0.22, 1, 0.36, 1];
 const Career = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,13 +122,48 @@ const Career = () => {
       <BannerImg image={Images.careerBanner} alt="" className="sm:block hidden" />
       <BannerImg image={mobile_carr} alt="Career section banner optimized for mobile view." className="sm:hidden block" />
       <div className="container-base px-4 mb-20">
-      <div className="flex flex-col items-center justify-center mt-10 sm:mt-20 px-0  md:px-20">
-  <TitleTwo text={'Career'} />
-  <span className="pt-7 text-xl md:text-3xl text-center capitalize ">Be Part of Something Great</span>
-  <p className="text-center mt-5 text-base text-gray-600 ]">
-    If you think you have the talent and the drive to work for the industry's most seasoned professionals with a culture built on collaboration and dedication to unparalleled quality, come and join us.
-  </p>
-</div>
+        {/* Section header */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: EASE }}
+          className="pt-12 pb-8 border-b border-[#EDEAEA] mb-10 text-center"
+        >
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <motion.span
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+              className="inline-block h-[2px] w-8 bg-black origin-left"
+            />
+            <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-customGrey">Careers</span>
+            <motion.span
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+              className="inline-block h-[2px] w-8 bg-black origin-right"
+            />
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4">
+            Be Part of Something{" "}
+            <span className="relative inline-block">
+              Great
+              <motion.span
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: EASE, delay: 0.5 }}
+                className="absolute -bottom-1 left-0 h-[3px] w-full bg-black origin-left"
+              />
+            </span>
+          </h1>
+          <p className="text-sm text-customGrey max-w-xl mx-auto leading-relaxed">
+            If you think you have the talent and drive to work with the industry's most seasoned professionals, come join us.
+          </p>
+        </motion.div>
 
         <div className="flex flex-col md:flex-row justify-between items-start  gap-10 md:px-20">
           <form className="space-y-5 w-full md:w-[45%] md:order-2 order-1 mt-20" onSubmit={handleSubmit(onSubmit)}>
@@ -240,18 +277,35 @@ const Career = () => {
             <CustomButton disabled={loading} type="submit" text={loading ? "Submitting..." : "Submit"} />
           </form>
 
-          {/* Current Openings Section - Show below form for mobile */}
-          <div className="md:w-[45%] w-full mt-6 md:order-1 order-2">
-            <span className="text-3xl">Current Openings</span>
-            <div className="space-y-4 mt-5">
+          {/* Current Openings Section */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.7, ease: EASE }}
+            className="md:w-[45%] w-full mt-6 md:order-1 order-2"
+          >
+            <div className="flex items-center gap-3 mb-5">
+              <span className="h-[2px] w-8 bg-black inline-block" />
+              <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-customGrey">Openings</span>
+            </div>
+            <h2 className="text-2xl font-bold mb-8">Current Openings</h2>
+            <div className="space-y-3">
               {jobOptions.map((job, index) => (
-                <div key={index} className="px-3 py-4 border bg-[#f8f8f8] rounded-[12px]">
-                  <span className="text-lg">{job}</span>
-                  <p>2+ Years Experience</p>
-                </div>
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, ease: EASE, delay: 0.05 * index }}
+                  className="flex items-center justify-between px-5 py-4 border border-[#EDEAEA] hover:border-black hover:bg-black hover:text-white group transition-all duration-300 cursor-default"
+                >
+                  <span className="text-sm font-medium group-hover:text-white transition-colors">{job}</span>
+                  <span className="text-xs text-customGrey group-hover:text-white/60 transition-colors">2+ Years Exp.</span>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
         <ConfirmationModal
